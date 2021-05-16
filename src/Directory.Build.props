@@ -1,0 +1,21 @@
+<Project>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+
+<!--
+    <!- 1591: Missing XML comment ->
+    <NoWarn>1591</NoWarn>
+    <!- 612, 618: Obsolete ->
+    <WarningsNotAsErrors>612;618</WarningsNotAsErrors>
+-->
+
+  </PropertyGroup>
+
+</Project>

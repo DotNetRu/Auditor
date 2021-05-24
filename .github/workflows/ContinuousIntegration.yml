@@ -22,4 +22,10 @@ jobs:
     - name: Build
       run: dotnet build --no-restore --configuration Release --nologo
     - name: Test
-      run: dotnet test --no-build --verbosity normal --configuration Release --nologo
+      run: dotnet test --no-build --configuration Release --nologo
+    - name: Pack
+      run: dotnet pack --output ./artifacts --no-build --configuration Release --nologo
+    - name: Publish
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key $NUGET_AUTH_TOKEN --source https://api.nuget.org/v3/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}

@@ -6,4 +6,11 @@
     <RootNamespace>Auditor.Data</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageId>DotNetRu.Auditor</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>DotNetRu Contributors</Authors>
+    <Company>DotNetRu</Company>
+  </PropertyGroup>
+
 </Project>

@@ -16,8 +16,16 @@
     <PackageProjectUrl>https://github.com/DotNetRu/Auditor</PackageProjectUrl>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="..\..\docs\icon.png" Visible="false" Pack="true" PackagePath="" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
   
 </Project>

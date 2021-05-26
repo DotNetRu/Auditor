@@ -1,4 +1,4 @@
-name: build
+name: Smoke
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
       - 'docs/**'
 
 jobs:
-  build:
+  test:
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -36,15 +36,23 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+
     - name: Restore dependencies
       run: dotnet restore
+
     - name: Build
-      run: dotnet build --no-restore --configuration Release --nologo
+      run: dotnet build --no-restore --configuration Debug --nologo
+
     - name: Test
-      run: dotnet test --no-build --configuration Release --nologo
+      run: dotnet test --no-build --configuration Debug --nologo
+
     - name: Pack
-      run: dotnet pack --output ./artifacts --no-build --configuration Release --nologo
-    - name: Publish
-      run: dotnet nuget push ./artifacts/*.nupkg --api-key $NUGET_AUTH_TOKEN --source https://api.nuget.org/v3/index.json
-      env:
-        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+      run: dotnet pack --output ./artifacts --no-build --configuration Debug --nologo --version-suffix build${{ github.run_number }}
+
+    # TODO: Add Action: https://github.com/alstr/todo-to-issue-action
+    - name: Save
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v2
+      with:
+        name: Artifacts
+        path: ./artifacts

@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <PackageId>DotNetRu.Auditor</PackageId>
-    <Version>0.0.1</Version>
+    <VersionPrefix>0.2.0</VersionPrefix>
     <Authors>DotNetRu Contributors</Authors>
     <Company>DotNetRu</Company>
     <Description>Library for working with the DotNetRu Audit database</Description>
@@ -27,5 +27,5 @@
     <None Include="..\..\docs\icon.png" Visible="false" Pack="true" PackagePath="" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
-  
+
 </Project>

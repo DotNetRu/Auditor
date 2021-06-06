@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <AssemblyName>Auditor.Tests</AssemblyName>
-    <RootNamespace>Auditor.Tests</RootNamespace>
+    <AssemblyName>DotNetRu.Auditor.Tests</AssemblyName>
+    <RootNamespace>DotNetRu.Auditor.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +18,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Data\Data.csproj" />
   </ItemGroup>
 
 </Project>

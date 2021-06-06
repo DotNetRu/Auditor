@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <AssemblyName>Auditor.Data</AssemblyName>
-    <RootNamespace>Auditor.Data</RootNamespace>
+    <AssemblyName>DotNetRu.Auditor.Data</AssemblyName>
+    <RootNamespace>DotNetRu.Auditor.Data</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>

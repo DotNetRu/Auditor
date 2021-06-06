@@ -10,7 +10,9 @@ trim_trailing_whitespace = true
 
 [*.cs]
 # Default Severity for all .NET Code Style rules below
-dotnet_analyzer_diagnostic.severity = warning
+dotnet_analyzer_diagnostic.severity = error
+# Severity for Naming rule violation
+dotnet_diagnostic.IDE1006.severity = error
 
 # New line preferences
 csharp_new_line_before_open_brace = all
@@ -67,15 +69,22 @@ csharp_style_deconstructed_variable_declaration = true:suggestion
 csharp_style_pattern_local_over_anonymous_function = true:suggestion
 csharp_style_inlined_variable_declaration = true:suggestion
 
-# Style Definitions
-dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 # Use PascalCase for constant fields  
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 dotnet_naming_rule.constant_fields_should_be_pascal_case.severity = suggestion
 dotnet_naming_rule.constant_fields_should_be_pascal_case.symbols = constant_fields
 dotnet_naming_rule.constant_fields_should_be_pascal_case.style = pascal_case_style
 dotnet_naming_symbols.constant_fields.applicable_kinds = field
 dotnet_naming_symbols.constant_fields.applicable_accessibilities = *
 dotnet_naming_symbols.constant_fields.required_modifiers = const
+
+# Use camelCase for private fields
+dotnet_naming_style.camel_case_style.capitalization = camel_case
+dotnet_naming_rule.private_fields_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case.style = camel_case_style
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
 
 # Organize usings
 dotnet_sort_system_directives_first = true

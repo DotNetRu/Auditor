@@ -49,7 +49,6 @@ jobs:
     - name: Pack
       run: dotnet pack --output ./artifacts --no-build --configuration Debug --nologo --version-suffix build${{ github.run_number }}
 
-    # TODO: Add Action: https://github.com/alstr/todo-to-issue-action
     - name: Save
       if: matrix.os == 'ubuntu-latest'
       uses: actions/upload-artifact@v2

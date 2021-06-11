@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace DotNetRu.Auditor.Storage.FileSystem.Physical
 {
@@ -9,24 +10,26 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
         {
         }
 
-        public Stream OpenForRead()
+        public ValueTask<Stream> OpenForReadAsync()
         {
             if (!Exists)
             {
                 throw NotFoundFile.ToException(FullName);
             }
 
-            return File.OpenRead(FullName);
+            var inputStream = File.OpenRead(FullName);
+            return ValueTask.FromResult<Stream>(inputStream);
         }
 
-        public Stream OpenForWrite()
+        public ValueTask<Stream> OpenForWriteAsync()
         {
             if (!Exists)
             {
                 throw NotFoundFile.ToException(FullName);
             }
 
-            return File.OpenWrite(FullName);
+            var outputStream = File.OpenWrite(FullName);
+            return ValueTask.FromResult<Stream>(outputStream);
         }
     }
 }

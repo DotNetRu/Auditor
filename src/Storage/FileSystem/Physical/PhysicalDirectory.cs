@@ -11,7 +11,7 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
         {
         }
 
-        public Task<IDirectory> GetDirectoryInfoAsync(string subPath)
+        public ValueTask<IDirectory> GetDirectoryInfoAsync(string subPath)
         {
             if (!Exists)
             {
@@ -20,10 +20,10 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
 
             var fullDirectoryName = GetFullPath(subPath);
             var directory = new PhysicalDirectory(fullDirectoryName);
-            return Task.FromResult<IDirectory>(directory);
+            return ValueTask.FromResult<IDirectory>(directory);
         }
 
-        public Task<IFile> GetFileInfoAsync(string subPath)
+        public ValueTask<IFile> GetFileInfoAsync(string subPath)
         {
             if (!Exists)
             {
@@ -32,7 +32,7 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
 
             var fullFileName = GetFullPath(subPath);
             var file = new PhysicalFile(fullFileName);
-            return Task.FromResult<IFile>(file);
+            return ValueTask.FromResult<IFile>(file);
         }
 
         public async IAsyncEnumerable<IDirectory> EnumerateDirectoriesAsync()

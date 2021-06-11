@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using DotNetRu.Auditor.Storage.FileSystem;
 using Xunit;
@@ -7,6 +8,8 @@ namespace DotNetRu.Auditor.Tests.Storage.FileSystem
 {
     public sealed class FileSystemEntryTest
     {
+        private static readonly string PathRoot = Path.GetPathRoot(Directory.GetCurrentDirectory()) ?? String.Empty;
+
         [Fact]
         public void ShouldResolveFullName()
         {
@@ -38,8 +41,16 @@ namespace DotNetRu.Auditor.Tests.Storage.FileSystem
             Assert.Equal(expectedName, entry.Name);
         }
 
+        public static IEnumerable<object[]> GetDataForFullPathTest()
+        {
+            // "C:\" + "Abc" => "C:\Abc"
+            yield return new object[] { PathRoot, "Abc", Path.Combine(PathRoot, "Abc") };
+            // "C:\1" + ".\Abc" => "C:\1\Abc"
+            yield return new object[] { Path.Combine(PathRoot, "1"), Path.Combine(".", "Abc"), Path.Combine(PathRoot, "1", "Abc") };
+        }
+
         [Theory]
-        [MemberData(nameof(CrossPlatformDataGenerator.GetDataForFullPathTest), MemberType = typeof(CrossPlatformDataGenerator))]
+        [MemberData(nameof(GetDataForFullPathTest))]
         public void ShouldResolveFullPath(string root, string subPath, string expectedFullPath)
         {
             // Act
@@ -53,9 +64,8 @@ namespace DotNetRu.Auditor.Tests.Storage.FileSystem
         public void ShouldRaiseErrorWhenHackingRoot()
         {
             // Arrange
-            var fsRoot= Path.GetPathRoot(Directory.GetCurrentDirectory()) ?? string.Empty;
-            string root = Path.Combine(fsRoot, "A", "B");
-            string subPath = Path.Combine("..", "..", "etc","passwd");
+            var root = Path.Combine(PathRoot, "A", "B");
+            var subPath = Path.Combine("..", "..", "etc", "passwd");
 
             // Act
             void HackRoot() => GetFullPath(root, subPath);
@@ -66,7 +76,6 @@ namespace DotNetRu.Auditor.Tests.Storage.FileSystem
 
         private static string GetFullPath(string root, string subPath)
         {
-            // var root = AssertEx.NotNull(Path.GetPathRoot(typeof(FileSystemEntry).Assembly.Location));
             var entry = new TestEntry(root);
             return entry.GetFullSubPath(subPath);
         }

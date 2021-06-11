@@ -10,11 +10,11 @@ namespace DotNetRu.Auditor.Storage.FileSystem
         {
         }
 
-        public static Task<IDirectory> ToTask(string fullName) => Task.FromResult<IDirectory>(new NotFoundDirectory(fullName));
+        public static ValueTask<IDirectory> ToTask(string fullName) => ValueTask.FromResult<IDirectory>(new NotFoundDirectory(fullName));
 
-        public Task<IDirectory> GetDirectoryInfoAsync(string subPath) => ToTask(subPath);
+        public ValueTask<IDirectory> GetDirectoryInfoAsync(string subPath) => ToTask(subPath);
 
-        public Task<IFile> GetFileInfoAsync(string subPath) => NotFoundFile.ToTask(subPath);
+        public ValueTask<IFile> GetFileInfoAsync(string subPath) => NotFoundFile.ToTask(subPath);
 
         public IAsyncEnumerable<IDirectory> EnumerateDirectoriesAsync() => AsyncEnumerable.Empty<IDirectory>();
 

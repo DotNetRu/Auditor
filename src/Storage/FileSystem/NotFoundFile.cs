@@ -11,12 +11,12 @@ namespace DotNetRu.Auditor.Storage.FileSystem
         {
         }
 
-        public static Task<IFile> ToTask(string fullName) => Task.FromResult<IFile>(new NotFoundFile(fullName));
+        public static ValueTask<IFile> ToTask(string fullName) => ValueTask.FromResult<IFile>(new NotFoundFile(fullName));
 
         public static Exception ToException(string fullName) => new FileNotFoundException($"Could not find file: {fullName}", fullName);
 
-        public Stream OpenForRead() => throw ToException(FullName);
+        public ValueTask<Stream> OpenForReadAsync() => throw ToException(FullName);
 
-        public Stream OpenForWrite() => throw ToException(FullName);
+        public ValueTask<Stream> OpenForWriteAsync() => throw ToException(FullName);
     }
 }

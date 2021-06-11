@@ -15,5 +15,3 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
         }
     }
 }
-
-

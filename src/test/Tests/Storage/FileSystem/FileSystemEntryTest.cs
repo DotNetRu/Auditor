@@ -39,8 +39,7 @@ namespace DotNetRu.Auditor.Tests.Storage.FileSystem
         }
 
         [Theory]
-        [InlineData(@"C:\", @"Abc", @"C:\Abc")]
-        [InlineData(@"C:\1", @".\Abc", @"C:\1\Abc")]
+        [MemberData(nameof(CrossPlatformDataGenerator.GetDataForFullPathTest), MemberType = typeof(CrossPlatformDataGenerator))]
         public void ShouldResolveFullPath(string root, string subPath, string expectedFullPath)
         {
             // Act
@@ -54,8 +53,9 @@ namespace DotNetRu.Auditor.Tests.Storage.FileSystem
         public void ShouldRaiseErrorWhenHackingRoot()
         {
             // Arrange
-            const string root = @"C:\A\B";
-            const string subPath = @"..\..\etc\passwd";
+            var fsRoot= Path.GetPathRoot(Directory.GetCurrentDirectory()) ?? string.Empty;
+            string root = Path.Combine(fsRoot, "A", "B");
+            string subPath = Path.Combine("..", "..", "etc","passwd");
 
             // Act
             void HackRoot() => GetFullPath(root, subPath);

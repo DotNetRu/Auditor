@@ -14,8 +14,10 @@ namespace DotNetRu.Auditor.Tests.Storage.FileSystem
 
         public static IEnumerable<object[]> GetDataForFullPathTest()
         {
+            // "C:\" + "Abc" => "C:\Abc"
             yield return new object[] {filesystemRoot, "Abc", Path.Combine(filesystemRoot, "Abc")};
-            yield return new object[] {Path.Combine(filesystemRoot, "1"), @".\Abc", Path.Combine(filesystemRoot, "1", "Abc")};
+            // "C:\1" + ".\Abc" => "C:\1\Abc"
+            yield return new object[] {Path.Combine(filesystemRoot, "1"), Path.Combine(".","Abc"), Path.Combine(filesystemRoot, "1", "Abc")};
         }
     }
 }

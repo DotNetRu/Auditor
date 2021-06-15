@@ -7,6 +7,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      version: 0.${{ github.run_number }}
+
     steps:
     - uses: actions/checkout@v2
 
@@ -21,18 +24,20 @@ jobs:
         dotnet restore ./src/All/All.csproj
 
     - name: Build
-      run: dotnet build --no-restore --configuration Release --nologo
+      run: dotnet build --no-restore --configuration Release --nologo -p:Version=${{ env.version }}
 
     - name: Test
       run: dotnet test --no-build --configuration Release --nologo
 
     - name: Pack
-      run: dotnet pack --output ./artifacts --no-build --configuration Release --nologo --version-suffix build${{ github.run_number }}
+      run: |
+        dotnet pack --output ./artifacts --no-build --configuration Release --nologo -p:PackageVersion=${{ env.version }}
+        dotnet pack ./src/All/All.csproj --output ./artifacts --no-build --configuration Release --nologo -p:PackageVersion=${{ env.version }}
 
     - name: Save
       uses: actions/upload-artifact@v2
       with:
-        name: Artifacts
+        name: Artifacts-${{ env.version }}
         path: |
           ./artifacts
           !**/*.snupkg

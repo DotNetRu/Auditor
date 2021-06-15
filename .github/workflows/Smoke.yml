@@ -18,6 +18,8 @@ jobs:
     strategy:
         matrix:
             os: [ubuntu-latest, windows-latest, macos-latest]
+    env:
+      version: 0.1.${{ github.run_number }}
 
     steps:
     - uses: actions/checkout@v2
@@ -31,6 +33,7 @@ jobs:
         echo "Head Ref = ${{ github.head_ref }}"
         echo "Base Ref = ${{ github.base_ref }}"
         echo "Workspace = ${{ github.workspace }}"
+        echo "Version = ${{ env.version }}"
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
@@ -43,19 +46,21 @@ jobs:
         dotnet restore ./src/All/All.csproj
 
     - name: Build
-      run: dotnet build --no-restore --configuration Debug --nologo
+      run: dotnet build --no-restore --configuration Debug --nologo -p:Version=${{ env.version }}
 
     - name: Test
       run: dotnet test --no-build --configuration Debug --nologo
 
     - name: Pack
-      run: dotnet pack --output ./artifacts --no-build --configuration Debug --nologo --version-suffix build${{ github.run_number }}
+      run: |
+        dotnet pack --output ./artifacts --no-build --configuration Debug --nologo -p:PackageVersion=${{ env.version }}
+        dotnet pack ./src/All/All.csproj --output ./artifacts --no-build --configuration Debug --nologo -p:PackageVersion=${{ env.version }}
 
     - name: Save
       if: matrix.os == 'ubuntu-latest'
       uses: actions/upload-artifact@v2
       with:
-        name: Artifacts
+        name: Artifacts-${{ env.version }}
         path: |
           ./artifacts
           !**/*.snupkg

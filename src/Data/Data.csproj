@@ -4,28 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>DotNetRu.Auditor.Data</AssemblyName>
     <RootNamespace>DotNetRu.Auditor.Data</RootNamespace>
+    <Description>Structuries for working with the DotNetRu Audit database</Description>
   </PropertyGroup>
-
-  <PropertyGroup>
-    <PackageId>DotNetRu.Auditor</PackageId>
-    <VersionPrefix>0.2.0</VersionPrefix>
-    <Authors>DotNetRu Contributors</Authors>
-    <Company>DotNetRu</Company>
-    <Description>Library for working with the DotNetRu Audit database</Description>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/DotNetRu/Auditor</PackageProjectUrl>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="..\..\docs\icon.png" Visible="false" Pack="true" PackagePath="" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-  </ItemGroup>
 
 </Project>

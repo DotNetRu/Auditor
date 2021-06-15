@@ -1,16 +1,38 @@
 <Project>
 
-  <PropertyGroup>
+  <PropertyGroup Label="Language">
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <IsTestProject Condition=" '$(IsTestProject)' == '' ">false</IsTestProject>
   </PropertyGroup>
 
-  <PropertyGroup>
+  <PropertyGroup Label="Restrictions">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
 
+  <PropertyGroup Label="Package">
+    <PackageId Condition=" '$(PackageId)' == '' ">$(AssemblyName)</PackageId>
+    <Authors>Anatoly Kulakov, DotNetRu Contributors</Authors>
+    <Company>DotNetRu</Company>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/DotNetRu/Auditor</PackageProjectUrl>
+  </PropertyGroup>
   <ItemGroup>
+    <None Include="..\..\docs\icon.png" Visible="false" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <PropertyGroup Label="SourceLink" Condition=" '$(IsTestProject)' == 'false' ">
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(IsTestProject)' == 'false' ">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(IsTestProject)' == 'false' ">
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>DotNetRu.Auditor.Tests</_Parameter1>
     </AssemblyAttribute>

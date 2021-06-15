@@ -23,5 +23,7 @@ namespace DotNetRu.Auditor.Storage.FileSystem
         IAsyncEnumerable<IFile> EnumerateFilesAsync();
 
         ValueTask<IFile> CreateFileAsync(string subPath);
+
+        ValueTask DeleteFileAsync(string subPath);
     }
 }

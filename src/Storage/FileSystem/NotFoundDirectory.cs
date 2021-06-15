@@ -25,9 +25,6 @@ namespace DotNetRu.Auditor.Storage.FileSystem
             throw new System.NotImplementedException();
         }
 
-        public ValueTask DeleteFileAsync(string subPath)
-        {
-            throw new System.NotImplementedException();
-        }
+        public ValueTask DeleteFileAsync(string subPath) => throw NotFoundFile.ToException(GetFullPath(subPath));
     }
 }

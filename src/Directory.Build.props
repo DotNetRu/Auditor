@@ -1,18 +1,8 @@
 <Project>
 
-  <PropertyGroup Label="Language">
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
-    <IsTestProject Condition=" '$(IsTestProject)' == '' ">false</IsTestProject>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Restrictions">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
   <PropertyGroup Label="Package">
-    <PackageId Condition=" '$(PackageId)' == '' ">$(AssemblyName)</PackageId>
     <Authors>Anatoly Kulakov, DotNetRu Contributors</Authors>
     <Company>DotNetRu</Company>
     <PackageIcon>icon.png</PackageIcon>
@@ -22,19 +12,19 @@
     <None Include="..\..\docs\icon.png" Visible="false" Pack="true" PackagePath="" />
   </ItemGroup>
 
-  <PropertyGroup Label="SourceLink" Condition=" '$(IsTestProject)' == 'false' ">
+  <PropertyGroup Label="SourceLink">
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
-  <ItemGroup Condition=" '$(IsTestProject)' == 'false' ">
+  <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(IsTestProject)' == 'false' ">
+  <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>DotNetRu.Auditor.Tests</_Parameter1>
+      <_Parameter1>DotNetRu.Auditor.UnitTests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 

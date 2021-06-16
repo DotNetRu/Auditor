@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>DotNetRu.Auditor.Storage</AssemblyName>
     <RootNamespace>DotNetRu.Auditor.Storage</RootNamespace>
     <Description>Persistence level for working with the DotNetRu Audit database</Description>

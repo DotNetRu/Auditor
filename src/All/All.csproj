@@ -1,12 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
     <NoBuild>true</NoBuild>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
     <PackageId>DotNetRu.Auditor</PackageId>
     <Description>Libraries for working with the DotNetRu Audit database</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Label="SourceLink">
+    <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>

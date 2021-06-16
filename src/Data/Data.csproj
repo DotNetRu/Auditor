@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>DotNetRu.Auditor.Data</AssemblyName>
     <RootNamespace>DotNetRu.Auditor.Data</RootNamespace>
     <Description>Structuries for working with the DotNetRu Audit database</Description>

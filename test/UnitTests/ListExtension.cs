@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DotNetRu.Auditor.Tests
+namespace DotNetRu.Auditor.UnitTests
 {
     internal static class ListExtension
     {

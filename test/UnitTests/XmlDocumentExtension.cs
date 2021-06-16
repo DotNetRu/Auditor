@@ -3,7 +3,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
 
-namespace DotNetRu.Auditor.Tests
+namespace DotNetRu.Auditor.UnitTests
 {
     internal static class XmlDocumentExtension
     {

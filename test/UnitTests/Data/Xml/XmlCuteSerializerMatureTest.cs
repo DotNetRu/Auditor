@@ -2,7 +2,7 @@
 using DotNetRu.Auditor.Data.Xml;
 using Xunit;
 
-namespace DotNetRu.Auditor.Tests.Data.Xml
+namespace DotNetRu.Auditor.UnitTests.Data.Xml
 {
     public sealed class XmlCuteSerializerMatureTest
     {

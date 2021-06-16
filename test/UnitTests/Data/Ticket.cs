@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-namespace DotNetRu.Auditor.Tests.Data
+namespace DotNetRu.Auditor.UnitTests.Data
 {
     public sealed class Ticket : IEquatable<Ticket>
     {

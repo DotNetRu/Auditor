@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace DotNetRu.Auditor.Storage.FileSystem
@@ -20,10 +22,8 @@ namespace DotNetRu.Auditor.Storage.FileSystem
 
         public IAsyncEnumerable<IFile> EnumerateFilesAsync() => AsyncEnumerable.Empty<IFile>();
 
-        public ValueTask<IFile> CreateFileAsync(string subPath)
-        {
-            throw new System.NotImplementedException();
-        }
+        public ValueTask<IFile> CreateFileAsync(string subPath) =>
+            throw new DirectoryNotFoundException($"Can't create file \"{subPath}\" because directory \"{FullName}\" not found");
 
         public ValueTask DeleteFileAsync(string subPath) => throw NotFoundFile.ToException(GetFullPath(subPath));
     }

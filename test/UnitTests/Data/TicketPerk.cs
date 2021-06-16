@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace DotNetRu.Auditor.Tests.Data
+namespace DotNetRu.Auditor.UnitTests.Data
 {
     public sealed class TicketPerk : IEquatable<TicketPerk>
     {

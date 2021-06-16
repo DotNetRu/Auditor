@@ -4,7 +4,7 @@ using System.IO;
 using DotNetRu.Auditor.Storage.FileSystem;
 using Xunit;
 
-namespace DotNetRu.Auditor.Tests.Storage.FileSystem
+namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
 {
     public sealed class FileSystemEntryTest
     {

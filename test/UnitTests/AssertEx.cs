@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace DotNetRu.Auditor.Tests
+namespace DotNetRu.Auditor.UnitTests
 {
     internal static class AssertEx
     {

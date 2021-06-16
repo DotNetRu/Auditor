@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <AssemblyName>DotNetRu.Auditor.Tests</AssemblyName>
-    <RootNamespace>DotNetRu.Auditor.Tests</RootNamespace>
+    <AssemblyName>DotNetRu.Auditor.UnitTests</AssemblyName>
+    <RootNamespace>DotNetRu.Auditor.UnitTests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Data\Data.csproj" />
-    <ProjectReference Include="..\..\Storage\Storage.csproj" />
+    <ProjectReference Include="..\..\src\Data\Data.csproj" />
+    <ProjectReference Include="..\..\src\Storage\Storage.csproj" />
   </ItemGroup>
 
 </Project>

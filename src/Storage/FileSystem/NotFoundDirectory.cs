@@ -19,5 +19,10 @@ namespace DotNetRu.Auditor.Storage.FileSystem
         public IAsyncEnumerable<IDirectory> EnumerateDirectoriesAsync() => AsyncEnumerable.Empty<IDirectory>();
 
         public IAsyncEnumerable<IFile> EnumerateFilesAsync() => AsyncEnumerable.Empty<IFile>();
+
+        public ValueTask<IFile> CreateFileAsync(string subPath)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

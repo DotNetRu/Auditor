@@ -64,5 +64,15 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
                 yield return new PhysicalFile(fileFullName);
             }
         }
+
+        public ValueTask<IFile> CreateFileAsync(string subPath)
+        {
+            if (!Exists)
+                return NotFoundFile.ToTask(subPath);
+
+            var createdFile = new PhysicalFile(subPath);
+            using var fileStream = File.Create(createdFile.FullName);
+            return ValueTask.FromResult<IFile>(createdFile);
+        }
     }
 }

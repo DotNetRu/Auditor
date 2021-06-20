@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using DotNetRu.Auditor.Storage.FileSystem;
 using Xunit;
 
@@ -77,17 +78,19 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
         private static string GetFullPath(string root, string subPath)
         {
             var entry = new TestEntry(root);
-            return entry.GetFullSubPath(subPath);
+            return entry.GetFullChildName(subPath);
         }
 
         private sealed class TestEntry : FileSystemEntry
         {
             public TestEntry(string fullName)
-                : base(fullName, true)
+                : base(fullName)
             {
             }
 
-            public string GetFullSubPath(string subPath) => base.GetFullPath(subPath);
+            public string GetFullChildName(string subPath) => base.GetFullChildPath(subPath);
+
+            public override ValueTask<bool> ExistsAsync() => throw new NotSupportedException();
         }
     }
 }

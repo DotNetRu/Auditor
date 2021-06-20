@@ -8,15 +8,17 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
     public sealed class PhysicalFile : FileSystemEntry, IWritableFile
     {
         public PhysicalFile(string fullName)
-            : base(fullName, File.Exists(fullName))
+            : base(fullName)
         {
         }
+
+        public override ValueTask<bool> ExistsAsync() => ValueTask.FromResult(Exists);
 
         public ValueTask<Stream> OpenForReadAsync()
         {
             if (!Exists)
             {
-                throw NotFoundFile.AsException(FullName);
+                throw FileNotFound();
             }
 
             var inputStream = File.OpenRead(FullName);
@@ -32,11 +34,7 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
 
         public ValueTask<Stream> OpenForWriteAsync()
         {
-            if (!Exists)
-            {
-                throw NotFoundFile.AsException(FullName);
-            }
-
+            // TDO: Create full path hierarchy
             var outputStream = File.OpenWrite(FullName);
             return ValueTask.FromResult<Stream>(outputStream);
         }
@@ -57,8 +55,9 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
                 // Result will be checked later
             }
 
-            var exists = File.Exists(FullName);
-            return ValueTask.FromResult(!exists);
+            return ValueTask.FromResult(!Exists);
         }
+
+        private bool Exists => File.Exists(FullName);
     }
 }

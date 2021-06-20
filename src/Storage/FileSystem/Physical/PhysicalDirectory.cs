@@ -11,7 +11,7 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
         {
         }
 
-        public ValueTask<IDirectory> GetDirectoryInfoAsync(string subPath)
+        public ValueTask<IDirectory> GetDirectoryAsync(string subPath)
         {
             if (!Exists)
             {
@@ -23,7 +23,7 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
             return ValueTask.FromResult<IDirectory>(directory);
         }
 
-        public ValueTask<IFile> GetFileInfoAsync(string subPath)
+        public ValueTask<IFile> GetFileAsync(string subPath)
         {
             if (!Exists)
             {

@@ -14,9 +14,9 @@ namespace DotNetRu.Auditor.Storage.FileSystem
     /// </remarks>>
     public interface IDirectory : IFileSystemEntry
     {
-        ValueTask<IDirectory> GetDirectoryInfoAsync(string subPath);
+        ValueTask<IDirectory> GetDirectoryAsync(string subPath);
 
-        ValueTask<IFile> GetFileInfoAsync(string subPath);
+        ValueTask<IFile> GetFileAsync(string subPath);
 
         IAsyncEnumerable<IDirectory> EnumerateDirectoriesAsync();
 

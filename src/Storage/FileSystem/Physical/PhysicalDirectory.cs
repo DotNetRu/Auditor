@@ -7,31 +7,23 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
     public class PhysicalDirectory : FileSystemEntry, IDirectory
     {
         public PhysicalDirectory(string fullName)
-            : base(fullName, Directory.Exists(fullName))
+            : base(fullName)
         {
         }
 
-        public ValueTask<IDirectory> GetDirectoryAsync(string subPath)
-        {
-            if (!Exists)
-            {
-                return NotFoundDirectory.AsTask(subPath);
-            }
+        public override ValueTask<bool> ExistsAsync() => ValueTask.FromResult(Exists);
 
-            var fullDirectoryName = GetFullPath(subPath);
-            var directory = new PhysicalDirectory(fullDirectoryName);
+        public ValueTask<IDirectory> GetDirectoryAsync(string childDirectoryName)
+        {
+            var fullChildName = GetFullChildPath(childDirectoryName);
+            var directory = new PhysicalDirectory(fullChildName);
             return ValueTask.FromResult<IDirectory>(directory);
         }
 
-        public ValueTask<IFile> GetFileAsync(string subPath)
+        public ValueTask<IFile> GetFileAsync(string childFileName)
         {
-            if (!Exists)
-            {
-                return NotFoundFile.AsTask(subPath);
-            }
-
-            var fullFileName = GetFullPath(subPath);
-            var file = new PhysicalFile(fullFileName);
+            var fullChildName = GetFullChildPath(childFileName);
+            var file = new PhysicalFile(fullChildName);
             return ValueTask.FromResult<IFile>(file);
         }
 
@@ -64,5 +56,7 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
                 yield return new PhysicalFile(fileFullName);
             }
         }
+
+        private bool Exists => Directory.Exists(FullName);
     }
 }

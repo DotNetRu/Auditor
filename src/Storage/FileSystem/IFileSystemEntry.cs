@@ -1,4 +1,6 @@
-﻿namespace DotNetRu.Auditor.Storage.FileSystem
+﻿using System.Threading.Tasks;
+
+namespace DotNetRu.Auditor.Storage.FileSystem
 {
     public interface IFileSystemEntry
     {
@@ -6,6 +8,6 @@
 
         string FullName { get; }
 
-        bool Exists { get; }
+        ValueTask<bool> ExistsAsync();
     }
 }

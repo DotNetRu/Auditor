@@ -1,34 +1,36 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace DotNetRu.Auditor.Storage.FileSystem
 {
     public abstract class FileSystemEntry : IFileSystemEntry
     {
-        protected FileSystemEntry(string fullName, bool exists)
+        protected FileSystemEntry(string fullName)
         {
             FullName = Path.GetFullPath(fullName);
             Name = Path.GetFileName(FullName);
-            Exists = exists;
         }
 
         public string Name { get; }
 
         public string FullName { get; }
 
-        public bool Exists { get; }
+        public abstract ValueTask<bool> ExistsAsync();
 
-        protected string GetFullPath(string subPath)
+        protected string GetFullChildPath(string childName)
         {
-            var childrenPath = Path.Combine(FullName, subPath);
-            var childrenFullPath = Path.GetFullPath(childrenPath);
+            var childPath = Path.Combine(FullName, childName);
+            var fullChildPath = Path.GetFullPath(childPath);
 
-            if (!childrenFullPath.StartsWith(FullName, StringComparison.OrdinalIgnoreCase))
+            if (!fullChildPath.StartsWith(FullName, StringComparison.OrdinalIgnoreCase))
             {
-                throw new ArgumentException($"Children path «{childrenFullPath}» should be under the root «{FullName}»");
+                throw new ArgumentException($"Child path «{fullChildPath}» should be under the root «{FullName}»");
             }
 
-            return childrenFullPath;
+            return fullChildPath;
         }
+
+        protected FileNotFoundException FileNotFound() => new FileNotFoundException($"Could not find file: {FullName}", FullName);
     }
 }

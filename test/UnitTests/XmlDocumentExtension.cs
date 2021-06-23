@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
+using Xunit;
 
 namespace DotNetRu.Auditor.UnitTests
 {

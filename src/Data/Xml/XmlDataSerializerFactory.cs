@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Xml.Serialization;
 using DotNetRu.Auditor.Data.Model;
 
 using IEntitySerializer = System.Object;

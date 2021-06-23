@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage", "src\Storage\Stor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "test\UnitTests\UnitTests.csproj", "{0FBFA3F7-A271-4E0D-BE06-BC96D9B9AAB8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "test\IntegrationTests\IntegrationTests.csproj", "{E3845604-03FE-4299-9F95-580581048B4A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,8 +62,21 @@ Global
 		{0FBFA3F7-A271-4E0D-BE06-BC96D9B9AAB8}.Release|x64.Build.0 = Release|Any CPU
 		{0FBFA3F7-A271-4E0D-BE06-BC96D9B9AAB8}.Release|x86.ActiveCfg = Release|Any CPU
 		{0FBFA3F7-A271-4E0D-BE06-BC96D9B9AAB8}.Release|x86.Build.0 = Release|Any CPU
+		{E3845604-03FE-4299-9F95-580581048B4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3845604-03FE-4299-9F95-580581048B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3845604-03FE-4299-9F95-580581048B4A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E3845604-03FE-4299-9F95-580581048B4A}.Debug|x64.Build.0 = Debug|Any CPU
+		{E3845604-03FE-4299-9F95-580581048B4A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E3845604-03FE-4299-9F95-580581048B4A}.Debug|x86.Build.0 = Debug|Any CPU
+		{E3845604-03FE-4299-9F95-580581048B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3845604-03FE-4299-9F95-580581048B4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3845604-03FE-4299-9F95-580581048B4A}.Release|x64.ActiveCfg = Release|Any CPU
+		{E3845604-03FE-4299-9F95-580581048B4A}.Release|x64.Build.0 = Release|Any CPU
+		{E3845604-03FE-4299-9F95-580581048B4A}.Release|x86.ActiveCfg = Release|Any CPU
+		{E3845604-03FE-4299-9F95-580581048B4A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0FBFA3F7-A271-4E0D-BE06-BC96D9B9AAB8} = {D09148E2-D836-4E44-8D97-87EB094237E4}
+		{E3845604-03FE-4299-9F95-580581048B4A} = {D09148E2-D836-4E44-8D97-87EB094237E4}
 	EndGlobalSection
 EndGlobal

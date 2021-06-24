@@ -44,7 +44,7 @@ namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
             }
 
             // Assert
-            Assert.Equal(expectedDirectories, actualDirectories);
+            AssertEx.Equivalence(expectedDirectories, actualDirectories);
             Assert.All(actualExists, Assert.True);
         }
 
@@ -68,7 +68,7 @@ namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
             }
 
             // Assert
-            Assert.Equal(expectedFiles, actualFiles);
+            AssertEx.Equivalence(expectedFiles, actualFiles);
             Assert.All(actualExists, Assert.True);
         }
 

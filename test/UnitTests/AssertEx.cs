@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Xunit
 {
@@ -14,6 +16,12 @@ namespace Xunit
             }
 
             return value;
+        }
+
+        public static void Equivalence<T>(IEnumerable<T> expected, IEnumerable<T> actual)
+            where T : IComparable<T>
+        {
+            Assert.Equal(expected.OrderBy(i => i), actual.OrderBy(i => i));
         }
     }
 }

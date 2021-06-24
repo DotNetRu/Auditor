@@ -34,7 +34,8 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
 
         public ValueTask<Stream> OpenForWriteAsync()
         {
-            // TDO: Create full path hierarchy
+            EnsureParentDirectoryExists();
+
             var outputStream = File.OpenWrite(FullName);
             return ValueTask.FromResult<Stream>(outputStream);
         }
@@ -59,5 +60,14 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Physical
         }
 
         private bool Exists => File.Exists(FullName);
+
+        private void EnsureParentDirectoryExists()
+        {
+            var parentDirectoryPath = Path.GetDirectoryName(FullName);
+            if (parentDirectoryPath != null && !Directory.Exists(parentDirectoryPath))
+            {
+                Directory.CreateDirectory(parentDirectoryPath);
+            }
+        }
     }
 }

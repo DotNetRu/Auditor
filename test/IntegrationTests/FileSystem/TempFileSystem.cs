@@ -1,33 +1,30 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using DotNetRu.Auditor.Storage.FileSystem;
-using DotNetRu.Auditor.Storage.FileSystem.Physical;
 
-namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
+namespace DotNetRu.Auditor.IntegrationTests.FileSystem
 {
     public sealed class TempFileSystem : IDisposable
     {
         private static readonly string TempDirectoryPrefix = (typeof(IsRoot).Namespace ?? throw new InvalidOperationException());
 
-        private TempFileSystem(IDirectory root)
+        private TempFileSystem(string root)
         {
             Root = root;
         }
 
-        public IDirectory Root { get; }
+        public string Root { get; }
 
         public static TempFileSystem Create()
         {
             DeleteTempDirectories();
             var tempPath = CreateTempDirectory();
-            var tempDirectory = new PhysicalDirectory(tempPath);
-            return new TempFileSystem(tempDirectory);
+            return new TempFileSystem(tempPath);
         }
 
         public void Dispose()
         {
-            Directory.Delete(Root.FullName, true);
+            Directory.Delete(Root, true);
         }
 
         private static string GetSystemTempPath() => Path.GetTempPath();

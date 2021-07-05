@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Storage.FileSystem;
+using DotNetRu.Auditor.Storage.FileSystem.PathEngine;
 using Xunit;
 
 namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
 {
     public sealed class FileSystemEntryTest
     {
-        private static readonly string PathRoot = Path.GetPathRoot(Directory.GetCurrentDirectory()) ?? String.Empty;
+        private static readonly string RootPath = PhysicalFileSystem.RootPath;
 
         [Fact]
         public void ShouldResolveFullName()
@@ -45,9 +46,9 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
         public static IEnumerable<object[]> GetDataForFullPathTest()
         {
             // "C:\" + "Abc" => "C:\Abc"
-            yield return new object[] { PathRoot, "Abc", Path.Combine(PathRoot, "Abc") };
+            yield return new object[] { RootPath, "Abc", Path.Combine(RootPath, "Abc") };
             // "C:\1" + ".\Abc" => "C:\1\Abc"
-            yield return new object[] { Path.Combine(PathRoot, "1"), Path.Combine(".", "Abc"), Path.Combine(PathRoot, "1", "Abc") };
+            yield return new object[] { Path.Combine(RootPath, "1"), Path.Combine(".", "Abc"), Path.Combine(RootPath, "1", "Abc") };
         }
 
         [Theory]
@@ -65,7 +66,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
         public void ShouldRaiseErrorWhenHackingRoot()
         {
             // Arrange
-            var root = Path.Combine(PathRoot, "A", "B");
+            var root = Path.Combine(RootPath, "A", "B");
             var subPath = Path.Combine("..", "..", "etc", "passwd");
 
             // Act
@@ -83,8 +84,8 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
 
         private sealed class TestEntry : FileSystemEntry
         {
-            public TestEntry(string fullName)
-                : base(fullName)
+            public TestEntry(string path)
+                : base(path)
             {
             }
 

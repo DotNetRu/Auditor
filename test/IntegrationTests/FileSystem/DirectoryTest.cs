@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 using DotNetRu.Auditor.Storage.FileSystem;
 using Xunit;
 
-namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
+namespace DotNetRu.Auditor.IntegrationTests.FileSystem
 {
     [Collection(TempFileSystemDependency.Name)]
-    public sealed class PhysicalDirectoryTest
+    public sealed class DirectoryTest
     {
         private readonly IDirectory root;
 
-        public PhysicalDirectoryTest(TempFileSystemFixture fileSystem)
+        public DirectoryTest(FileSystemFixture fileSystem)
         {
-            root = fileSystem.Root;
+            root = fileSystem.PhysicalRoot;
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
             var actualFiles = new List<string>();
             var actualExists = new List<bool>();
 
-            var directory = await root.GetDirectoryAsync(Path.Combine("B", "B2")).ConfigureAwait(false);
+            var directory = root.GetDirectory(Path.Combine("B", "B2"));
 
             // Act
             await foreach (var file in directory.EnumerateFilesAsync().ConfigureAwait(false))
@@ -79,7 +79,7 @@ namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
             var nestedName = Path.Combine("A", "A2");
 
             // Act
-            var directory = await root.GetDirectoryAsync(nestedName).ConfigureAwait(false);
+            var directory = root.GetDirectory(nestedName);
 
             // Assert
             Assert.Equal("A2", directory.Name);
@@ -92,10 +92,10 @@ namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
         public async Task ShouldGetFileByName()
         {
             // Arrange
-            var directory = await root.GetDirectoryAsync(Path.Combine("A", "A2")).ConfigureAwait(false);
+            var directory = root.GetDirectory(Path.Combine("A", "A2"));
 
             // Act
-            var file = await directory.GetFileAsync("a20.txt").ConfigureAwait(false);
+            var file = directory.GetFile("a20.txt");
 
             // Assert
             Assert.Equal("a20.txt", file.Name);
@@ -111,7 +111,7 @@ namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
             const string? name = "non-existent-directory";
 
             // Act
-            var directory = await root.GetDirectoryAsync(name).ConfigureAwait(false);
+            var directory = root.GetDirectory(name);
 
             // Assert
             Assert.Equal(name, directory.Name);
@@ -127,7 +127,7 @@ namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
             const string name = "non-existent-file";
 
             // Act
-            var file = await root.GetFileAsync(name).ConfigureAwait(false);
+            var file = root.GetFile(name);
 
             // Assert
             Assert.Equal(name, file.Name);

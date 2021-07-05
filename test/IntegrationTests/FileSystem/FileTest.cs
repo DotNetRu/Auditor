@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 using DotNetRu.Auditor.Storage.FileSystem;
 using Xunit;
 
-namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
+namespace DotNetRu.Auditor.IntegrationTests.FileSystem
 {
     [Collection(TempFileSystemDependency.Name)]
-    public sealed class PhysicalFileTest
+    public sealed class FileTest
     {
         private readonly IFile file;
 
-        public PhysicalFileTest(TempFileSystemFixture fileSystem)
+        public FileTest(FileSystemFixture fileSystem)
         {
-            file = InitializeAsync(fileSystem.Root).GetAwaiter().GetResult();
+            file = Initialize(fileSystem.PhysicalRoot);
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
         }
 
         [Fact]
-        public async Task ShouldReturnFalseWhenWhenDeleteNonExistent()
+        public async Task ShouldReturnFalseWhenDeleteNonExistent()
         {
             // Arrange
             var fileExists = await file.ExistsAsync().ConfigureAwait(false);
@@ -101,9 +101,8 @@ namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
 
         private async Task<IWritableFile> GetWritable()
         {
-            var canWrite = await file.RequestWriteAccessAsync(out var writable).ConfigureAwait(false);
-            Assert.True(canWrite);
-            return AssertEx.NotNull(writable);
+            var writableFile = await file.RequestWriteAccessAsync().ConfigureAwait(false);
+            return AssertEx.NotNull(writableFile);
         }
 
         private async Task WriteAsync(string content)
@@ -116,13 +115,13 @@ namespace DotNetRu.Auditor.IntegrationTests.PhysicalFileSystem
             await fileWriter.WriteAsync(content).ConfigureAwait(false);
         }
 
-        private static async Task<IFile> InitializeAsync(IDirectory root)
+        private static IFile Initialize(IDirectory root)
         {
             static string Rand() => Guid.NewGuid().ToString("N");
 
-            var directory = await root.GetDirectoryAsync("C").ConfigureAwait(false);
+            var directory = root.GetDirectory("C");
             var name = Path.Combine(Rand(), Rand(), Rand()) + ".test";
-            var file = await directory.GetFileAsync(name).ConfigureAwait(false);
+            var file = directory.GetFile(name);
             return file;
         }
     }

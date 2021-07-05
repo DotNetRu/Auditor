@@ -5,8 +5,8 @@ namespace DotNetRu.Auditor.Storage.FileSystem
 {
     public interface IWritableFile : IFile
     {
-        ValueTask<Stream> OpenForWriteAsync();
+        Task<Stream> OpenForWriteAsync();
 
-        ValueTask<bool> DeleteAsync();
+        Task<bool> DeleteAsync();
     }
 }

@@ -2,13 +2,13 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace DotNetRu.Auditor.Storage.FileSystem
+namespace DotNetRu.Auditor.Storage.FileSystem.PathEngine
 {
-    public abstract class FileSystemEntry : IFileSystemEntry
+    internal abstract class FileSystemEntry : IFileSystemEntry
     {
-        protected FileSystemEntry(string fullName)
+        protected FileSystemEntry(string path)
         {
-            FullName = Path.GetFullPath(fullName);
+            FullName = Path.GetFullPath(path);
             Name = Path.GetFileName(FullName);
         }
 
@@ -30,7 +30,5 @@ namespace DotNetRu.Auditor.Storage.FileSystem
 
             return fullChildPath;
         }
-
-        protected FileNotFoundException FileNotFound() => new FileNotFoundException($"Could not find file: {FullName}", FullName);
     }
 }

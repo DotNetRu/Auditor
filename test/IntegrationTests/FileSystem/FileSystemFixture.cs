@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Storage.FileSystem;
@@ -14,18 +15,25 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
         {
             temp = TempFileSystem.Create();
             PhysicalRoot = PhysicalFileSystem.ForDirectory(temp.Root);
+            MemoryRoot = MemoryFileSystem.ForDirectory(AbsolutePath.Root.FullName);
+            AllRoots = new[] { PhysicalRoot, MemoryRoot };
 
-            InitializeAsync().GetAwaiter().GetResult();
+            InitializeAsync(PhysicalRoot).GetAwaiter().GetResult();
+            InitializeAsync(MemoryRoot).GetAwaiter().GetResult();
         }
 
         public IDirectory PhysicalRoot { get; }
+
+        public IDirectory MemoryRoot { get; }
+
+        public IReadOnlyList<IDirectory> AllRoots { get; }
 
         public void Dispose()
         {
             temp.Dispose();
         }
 
-        private async Task InitializeAsync()
+        private static async Task InitializeAsync(IDirectory root)
         {
             // A --→ A1 -→ a10.txt
             //   |-→ A2 -→ a20.txt
@@ -37,13 +45,13 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
             //
             // C -→ c0.txt
 
-            await CreateFileAsync(PhysicalRoot, Path.Combine("A", "A1", "a10.txt")).ConfigureAwait(false);
-            await CreateFileAsync(PhysicalRoot, Path.Combine("A", "A2", "a20.txt")).ConfigureAwait(false);
-            await CreateFileAsync(PhysicalRoot, Path.Combine("A", "A3", "a30.txt")).ConfigureAwait(false);
-            await CreateFileAsync(PhysicalRoot, Path.Combine("B", "B1", "b10.txt")).ConfigureAwait(false);
-            await CreateFileAsync(PhysicalRoot, Path.Combine("B", "B2", "b20.txt")).ConfigureAwait(false);
-            await CreateFileAsync(PhysicalRoot, Path.Combine("B", "B2", "b21.txt")).ConfigureAwait(false);
-            await CreateFileAsync(PhysicalRoot, Path.Combine("C", "c0.txt")).ConfigureAwait(false);
+            await CreateFileAsync(root, Path.Combine("A", "A1", "a10.txt")).ConfigureAwait(false);
+            await CreateFileAsync(root, Path.Combine("A", "A2", "a20.txt")).ConfigureAwait(false);
+            await CreateFileAsync(root, Path.Combine("A", "A3", "a30.txt")).ConfigureAwait(false);
+            await CreateFileAsync(root, Path.Combine("B", "B1", "b10.txt")).ConfigureAwait(false);
+            await CreateFileAsync(root, Path.Combine("B", "B2", "b20.txt")).ConfigureAwait(false);
+            await CreateFileAsync(root, Path.Combine("B", "B2", "b21.txt")).ConfigureAwait(false);
+            await CreateFileAsync(root, Path.Combine("C", "c0.txt")).ConfigureAwait(false);
         }
 
         private static async ValueTask<IWritableFile> CreateFileAsync(IDirectory root, string relativeFilePath)

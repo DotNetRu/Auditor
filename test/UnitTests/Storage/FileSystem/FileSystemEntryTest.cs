@@ -10,7 +10,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
 {
     public sealed class FileSystemEntryTest
     {
-        private static readonly string RootPath = PhysicalFileSystem.RootPath;
+        private static readonly string RootPath = AbsolutePath.Root.FullName;
 
         [Fact]
         public void ShouldResolveFullName()
@@ -43,12 +43,23 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
             Assert.Equal(expectedName, entry.Name);
         }
 
-        public static IEnumerable<object[]> GetDataForFullPathTest()
+        [Fact]
+        public void ShouldResolveNameFromRoot()
+        {
+            // Act
+            var entry = new TestEntry(RootPath);
+
+            // Assert
+            Assert.Equal(RootPath, entry.FullName);
+            Assert.Equal(RootPath, entry.Name);
+        }
+
+        public static IEnumerable<string[]> GetDataForFullPathTest()
         {
             // "C:\" + "Abc" => "C:\Abc"
-            yield return new object[] { RootPath, "Abc", Path.Combine(RootPath, "Abc") };
+            yield return new[] { RootPath, "Abc", Path.Combine(RootPath, "Abc") };
             // "C:\1" + ".\Abc" => "C:\1\Abc"
-            yield return new object[] { Path.Combine(RootPath, "1"), Path.Combine(".", "Abc"), Path.Combine(RootPath, "1", "Abc") };
+            yield return new[] { Path.Combine(RootPath, "1"), Path.Combine(".", "Abc"), Path.Combine(RootPath, "1", "Abc") };
         }
 
         [Theory]

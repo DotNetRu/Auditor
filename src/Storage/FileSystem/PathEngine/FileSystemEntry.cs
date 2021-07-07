@@ -9,7 +9,9 @@ namespace DotNetRu.Auditor.Storage.FileSystem.PathEngine
         protected FileSystemEntry(string path)
         {
             FullName = Path.GetFullPath(path);
-            Name = Path.GetFileName(FullName);
+
+            var name = Path.GetFileName(FullName);
+            Name = String.IsNullOrEmpty(name) ? FullName : name;
         }
 
         public string Name { get; }

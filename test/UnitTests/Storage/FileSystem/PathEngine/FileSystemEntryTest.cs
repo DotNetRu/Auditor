@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using DotNetRu.Auditor.Storage.FileSystem;
 using DotNetRu.Auditor.Storage.FileSystem.PathEngine;
+using DotNetRu.Auditor.Storage.IO;
 using Xunit;
 
-namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
+namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem.PathEngine
 {
     public sealed class FileSystemEntryTest
     {

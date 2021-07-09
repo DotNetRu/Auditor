@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using DotNetRu.Auditor.Storage.FileSystem;
+using DotNetRu.Auditor.Storage.IO;
 using Xunit;
 
-namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
+namespace DotNetRu.Auditor.UnitTests.Storage.IO
 {
     public sealed class AbsolutePathTest
     {
@@ -38,16 +37,40 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
         }
 
         [Fact]
-        public void ShouldResolveLength()
+        public void ShouldResolvePartsCount()
         {
             // Arrange
             var path = AbsolutePath.Root / "A" / "B";
 
             // Act
-            var pathLength = path.Count;
+            var partsCount = path.Count;
 
             // Assert
-            Assert.Equal(3, pathLength);
+            Assert.Equal(3, partsCount);
+        }
+
+        [Fact]
+        public void ShouldResolveParent()
+        {
+            // Arrange
+            var path = AbsolutePath.Root / "A" / "B";
+            var expectedParent = AbsolutePath.Root / "A";
+
+            // Act
+            var actualParent = path.Parent;
+
+            // Assert
+            Assert.Equal(expectedParent, actualParent);
+        }
+
+        [Fact]
+        public void ShouldNotResolveParent()
+        {
+            // Act
+            var actualParent = AbsolutePath.Root.Parent;
+
+            // Assert
+            Assert.Null(actualParent);
         }
 
         [Fact]
@@ -57,9 +80,8 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
             var root = AbsolutePath.Root;
 
             // Assert
-            Assert.True(root.IsRoot);
-
             Assert.True(Path.IsPathFullyQualified(root.FullName));
+            Assert.True(Path.IsPathRooted(root.FullName));
 
             var rootFullPath = Path.GetFullPath(root.FullName);
             Assert.Equal(root.FullName, rootFullPath);
@@ -71,18 +93,9 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
         [InlineData(@"A:")]
         [InlineData(@"b:\")]
         [InlineData(@"C:/")]
-        [InlineData(@"\")]
         [InlineData(@"/")]
         public void ShouldBeRoot(string path)
         {
-            // Arrange
-            const char volumeSeparatorChar = ':';
-            static bool IsValidDriveChar(char value) => value is >= 'A' and <= 'Z' or >= 'a' and <= 'z';
-            static bool IsDirectorySeparatorChar(char value) => value == Path.DirectorySeparatorChar || value == Path.AltDirectorySeparatorChar;
-            static bool IsUnixRoot(string path) => path.Length == 1 && IsDirectorySeparatorChar(path[0]);
-            static bool IsWindowsRoot(string path) =>
-                path.Length == 3 && IsValidDriveChar(path[0]) && path[1] == volumeSeparatorChar && IsDirectorySeparatorChar(path[2]);
-
             // Act
             var root = AbsolutePath.Parse(path);
             var rootFullName = root.FullName;
@@ -91,38 +104,56 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
             Assert.True(root.IsRoot);
 
             Assert.NotEmpty(rootFullName);
-            Assert.True(Path.IsPathRooted(rootFullName));
             Assert.Equal(rootFullName, root.Name);
             Assert.Null(root.Parent);
 
             var part = Assert.Single(root);
             Assert.Equal(rootFullName, part);
 
-            var isNix = IsUnixRoot(rootFullName);
-            var isWin = IsWindowsRoot(rootFullName);
-            Assert.True(isNix ^ isWin);
+            var parsedRoot = AbsolutePath.Parse(rootFullName).FullName;
+            Assert.Equal(rootFullName, parsedRoot);
+        }
 
-            var rootPath = Path.GetPathRoot(rootFullName);
-            Assert.Equal(rootFullName, rootPath);
+        [Fact]
+        public void ShouldBeNotRoot()
+        {
+            // Arrange
+            var path = AbsolutePath.Root / "A";
+
+            // Act
+            var isRoot = path.IsRoot;
+
+            // Assert
+            Assert.False(isRoot);
         }
 
         [Theory]
-        [MemberData(nameof(GetDataForParse))]
-        public void ShouldTryParse(string path, string expectedPath)
+        [InlineData(@"D:\A")]
+        [InlineData(@"D:\A\B\", @"D:\A\B")]
+        [InlineData("F:/A", @"F:\A")]
+        [InlineData("W:/A/", @"W:\A")]
+        [InlineData("Z:/A/B", @"Z:\A\B")]
+        [InlineData("/etc")]
+        [InlineData("/etc/", "/etc")]
+        [InlineData("/etc/passwd")]
+        public void ShouldTryParse(string path, string? expectedPath = null)
         {
+            // Arrange
+            expectedPath ??= path;
+
             // Act
             var canParse = AbsolutePath.TryParse(path, out var absolutePath);
 
             // Assert
             Assert.True(canParse);
-            Assert.Equal(Normalize(expectedPath), Normalize(absolutePath?.FullName));
+            Assert.Equal(expectedPath, absolutePath?.FullName);
         }
 
         [Fact]
         public void ShouldParse()
         {
             // Arrange
-            string path = Path.Combine("D:", "temp");
+            const string path = @"D:\temp";
 
             // Act
             var absolutePath = AbsolutePath.Parse(path);
@@ -134,14 +165,14 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
         [Theory]
         [InlineData("")]
         [InlineData(" ")]
-        [InlineData(" \t\n ")]
+        [InlineData(" \t\n\r ")]
         [InlineData(":")]
         [InlineData("A")]
         [InlineData("etc")]
-        [InlineData(@"A\B\C")]
         [InlineData("a/b/c")]
-        [InlineData("/r??t")]
-        [InlineData("/r*t")]
+        [InlineData(@"A\B\C")]
+        [InlineData(@"C:\r??t")]
+        [InlineData(@"C:\r*t")]
         public void ShouldTryNotParse(string path)
         {
             // Act
@@ -165,7 +196,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
         }
 
         [Fact]
-        public void ShouldCombine()
+        public void ShouldCombineChildDirectory()
         {
             // Arrange
             var expectedPath = Path.Combine(AbsolutePath.Root.FullName, "A", "B", "C");
@@ -178,25 +209,12 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
         }
 
         [Fact]
-        public void ShouldBeNotRoot()
-        {
-            // Arrange
-            var path = AbsolutePath.Root / "A";
-
-            // Act
-            var isRoot = path.IsRoot;
-
-            // Assert
-            Assert.False(isRoot);
-        }
-
-        [Fact]
         public void ShouldBeEqual()
         {
             // Arrange
             var path1 = AbsolutePath.Root / "A" / "B";
-            var path2Source = Path.Combine(AbsolutePath.Root.FullName, "A", "B") + Path.DirectorySeparatorChar;
-            var path2 = AbsolutePath.TryParse(path2Source, out var parsedPath) ? parsedPath : null;
+            var path2Source = Path.Combine(AbsolutePath.Root.FullName, "A", "B");
+            var path2 = AbsolutePath.Parse(path2Source);
 
             // Act
             var isEquals = path1.Equals(path2);
@@ -247,30 +265,6 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
         }
 
         [Fact]
-        public void ShouldResolveParent()
-        {
-            // Arrange
-            var path = AbsolutePath.Root / "A" / "B";
-            var expectedParent = AbsolutePath.Root / "A";
-
-            // Act
-            var actualParent = path.Parent;
-
-            // Assert
-            Assert.Equal(expectedParent, actualParent);
-        }
-
-        [Fact]
-        public void ShouldNotResolveParent()
-        {
-            // Act
-            var actualParent = AbsolutePath.Root.Parent;
-
-            // Assert
-            Assert.Null(actualParent);
-        }
-
-        [Fact]
         public void ShouldTakeParent()
         {
             // Arrange
@@ -282,6 +276,20 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
 
             // Assert
             Assert.Equal(expectedPath, parentPath.FullName);
+        }
+
+        [Fact]
+        public void ShouldNotTakeZeroParent()
+        {
+            // Arrange
+            var path = AbsolutePath.Root / "A" / "B" / "C";
+            var expectedPath = Path.Combine(AbsolutePath.Root.Name, "A");
+
+            // Act
+            AbsolutePath ZeroParent() => path.TakeParent(0);
+
+            // Assert
+            Assert.Throws<ArgumentException>(ZeroParent);
         }
 
         [Fact]
@@ -311,31 +319,41 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem
             Assert.Equal("C", path[3]);
         }
 
-        public static IEnumerable<string[]> GetDataForParse()
+        [Theory]
+        [InlineData("C:", @"C:\temp")]
+        [InlineData(@"C:\temp", @"C:\temp\docs")]
+        [InlineData("/", "/etc/config")]
+        public void ShouldDetectParentDirectoryFor(string parentDirectory, string childPath)
         {
-            var paths = new[]
-            {
-                AbsolutePath.Root.FullName,
-                "/etc",
-                Path.Combine("D:", "temp"),
-                Path.Combine("/etc", "passwd"),
-            };
+            // Arrange
+            var parent = AbsolutePath.Parse(parentDirectory);
+            var child = AbsolutePath.Parse(childPath);
 
-            yield return new[] { @"D:", @"D:\" };
-            yield return new[] { @"D:\", @"D:\" };
+            // Act
+            var isParent = parent.IsParentDirectoryFor(child);
 
-            foreach (var path in paths)
-            {
-                yield return new[] { path, path };
-            }
-
-            foreach (var path in paths)
-            {
-                var pathWithTail = path + Path.DirectorySeparatorChar;
-                yield return new[] { pathWithTail, path };
-            }
+            // Assert
+            Assert.True(isParent);
         }
 
-        private static string? Normalize(string? path) => path?.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        [Theory]
+        [InlineData(@"C:", "C:")]
+        [InlineData(@"C:\", "C:")]
+        [InlineData(@"C:\temp", @"C:\temp")]
+        [InlineData(@"C:\temp", "C:")]
+        [InlineData(@"D:\temp", @"C:\temp\docs")]
+        [InlineData(@"/etc/config", "/")]
+        public void ShouldNotDetectParentDirectoryFor(string parentDirectory, string childPath)
+        {
+            // Arrange
+            var parent = AbsolutePath.Parse(parentDirectory);
+            var child = AbsolutePath.Parse(childPath);
+
+            // Act
+            var isParent = parent.IsParentDirectoryFor(child);
+
+            // Assert
+            Assert.False(isParent);
+        }
     }
 }

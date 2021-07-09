@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using DotNetRu.Auditor.Storage.IO;
 
 namespace DotNetRu.Auditor.Storage.FileSystem.Memory
 {

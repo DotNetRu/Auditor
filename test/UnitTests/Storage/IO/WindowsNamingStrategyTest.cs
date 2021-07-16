@@ -50,17 +50,15 @@ namespace DotNetRu.Auditor.UnitTests.Storage.IO
             Assert.Equal(expectedIsRooted, actualIsRooted);
         }
 
-        public static IEnumerable<object[]> CombineTestCases()
+        public static TheoryData<IReadOnlyList<string>, string> CombineTestCases() => new()
         {
-            yield return Case(String.Empty);
-            yield return Case(@"C:", "C:");
-            yield return Case(@"C:\temp", "C:", "temp");
-            yield return Case(@"C:\temp", @"C:\", "temp");
-            yield return Case(@"C:\temp\docs", @"C:\", "temp", "docs");
-            yield return Case(@"C:\temp\docs", @"C:\", "", "temp", "", "docs");
-
-            static object[] Case(string expectedPath, params string[] paths) => new object[] { paths, expectedPath };
-        }
+            { Array.Empty<string>(), String.Empty },
+            { new[] { "C:" }, "C:" },
+            { new[] { "C:", "temp" }, @"C:\temp" },
+            { new[] { @"C:\", "temp" }, @"C:\temp" },
+            { new[] { @"C:\", "temp", "docs" }, @"C:\temp\docs" },
+            { new[] { @"C:\", "", "temp", "", "docs" }, @"C:\temp\docs" }
+        };
 
         [Theory]
         [MemberData(nameof(CombineTestCases))]

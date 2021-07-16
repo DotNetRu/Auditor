@@ -54,13 +54,13 @@ namespace DotNetRu.Auditor.UnitTests.Storage.FileSystem.PathEngine
             Assert.Equal(RootPath, entry.Name);
         }
 
-        public static IEnumerable<string[]> GetDataForFullPathTest()
+        public static TheoryData<string, string, string> GetDataForFullPathTest() => new()
         {
             // "C:\" + "Abc" => "C:\Abc"
-            yield return new[] { RootPath, "Abc", Path.Combine(RootPath, "Abc") };
+            { RootPath, "Abc", Path.Combine(RootPath, "Abc") },
             // "C:\1" + ".\Abc" => "C:\1\Abc"
-            yield return new[] { Path.Combine(RootPath, "1"), Path.Combine(".", "Abc"), Path.Combine(RootPath, "1", "Abc") };
-        }
+            { Path.Combine(RootPath, "1"), Path.Combine(".", "Abc"), Path.Combine(RootPath, "1", "Abc") }
+        };
 
         [Theory]
         [MemberData(nameof(GetDataForFullPathTest))]

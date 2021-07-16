@@ -49,16 +49,14 @@ namespace DotNetRu.Auditor.UnitTests.Storage.IO
             Assert.Equal(expectedIsRooted, actualIsRooted);
         }
 
-        public static IEnumerable<object[]> CombineTestCases()
+        public static TheoryData<IReadOnlyList<string>, string> CombineTestCases() => new()
         {
-            yield return Case(String.Empty);
-            yield return Case("/", "/");
-            yield return Case("/etc", "/", "etc");
-            yield return Case("/etc/config", "/", "etc", "config");
-            yield return Case("/etc/config", "/", "", "etc", "", "config");
-
-            static object[] Case(string expectedPath, params string[] paths) => new object[] { paths, expectedPath };
-        }
+            { Array.Empty<string>(), String.Empty },
+            { new[] { "/" }, "/" },
+            { new[] { "/", "etc" }, "/etc" },
+            { new[] { "/", "etc", "config" }, "/etc/config" },
+            { new[] { "/", "", "etc", "", "config" }, "/etc/config" }
+        };
 
         [Theory]
         [MemberData(nameof(CombineTestCases))]

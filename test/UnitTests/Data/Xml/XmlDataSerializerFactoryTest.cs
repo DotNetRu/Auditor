@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using DotNetRu.Auditor.Data;
 using DotNetRu.Auditor.Data.Model;
 using DotNetRu.Auditor.Data.Xml;
 using Xunit;
@@ -23,8 +24,10 @@ namespace DotNetRu.Auditor.UnitTests.Data.Xml
             Assert.NotNull(builder.Build());
         }
 
-        public static IEnumerable<object[]> ModelTypesAsSingleArgument =>
-            ModelTypes.Select(type => new[] {Activator.CreateInstance(type)!});
+        public static TheoryData<object> ModelTypesAsSingleArgument => ModelTypes
+            .Select(Activator.CreateInstance)
+            .WhereNotNull()
+            .ToTheoryData();
 
         private static IReadOnlyList<Type> ModelTypes => new List<Type>
         {

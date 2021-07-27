@@ -3,6 +3,6 @@
     public interface IDataSerializerFactory
     {
         IDataSerializer<T> Create<T>()
-            where T : class;
+            where T : IRecord;
     }
 }

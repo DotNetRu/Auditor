@@ -6,12 +6,12 @@ using IEntitySerializer = System.Object;
 
 namespace DotNetRu.Auditor.Data.Xml
 {
-    internal sealed class XmlDataSerializerFactory : IDataSerializerFactory
+    public sealed class XmlDataSerializerFactory : IDataSerializerFactory
     {
         private static readonly ConcurrentDictionary<Type, IEntitySerializer> Cache = new();
 
         public IDataSerializer<T> Create<T>()
-            where T : class
+            where T : IRecord
         {
             // NOTE: When we use XmlSerializer with overrides, framework cannot reuse generated assemblies.
             // Therefore, to avoid memory leaks, we should cache all serializers with the same overrides.
@@ -20,6 +20,7 @@ namespace DotNetRu.Auditor.Data.Xml
         }
 
         internal static XmlModelBuilder<T> CreateModelBuilder<T>()
+            where T : IRecord
         {
             object builder = typeof(T) switch
             {
@@ -33,11 +34,11 @@ namespace DotNetRu.Auditor.Data.Xml
                 _ => throw new InvalidOperationException($"Unknown model type: {typeof(T).FullName}")
             };
 
-            return (XmlModelBuilder<T>) builder;
+            return (XmlModelBuilder<T>)builder;
         }
 
         private static IDataSerializer<T> Build<T>()
-            where T : class
+            where T : IRecord
         {
             var overrides = CreateModelBuilder<T>().Build();
             return new XmlDataSerializer<T>(overrides);
@@ -88,7 +89,7 @@ namespace DotNetRu.Auditor.Data.Xml
             .Map("Talk")
             .Property(talk => talk.Id, "Id")
             .Collection(talk => talk.SpeakerIds, "SpeakerIds", "SpeakerId")
-            .Property(talk => talk.Title, "Title")
+            .Property(talk => talk.Name, "Title")
             .Property(talk => talk.Description, "Description")
             .Collection(talk => talk.SeeAlsoTalkIds, "SeeAlsoTalkIds", "TalkId")
             .Property(talk => talk.CodeUrl, "CodeUrl")

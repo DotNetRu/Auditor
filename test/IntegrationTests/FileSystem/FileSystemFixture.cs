@@ -8,8 +8,11 @@ using Xunit;
 
 namespace DotNetRu.Auditor.IntegrationTests.FileSystem
 {
-    public sealed class FileSystemFixture : IDisposable
+    [CollectionDefinition(Name)]
+    public sealed class FileSystemFixture : ICollectionFixture<FileSystemFixture>, IDisposable
     {
+        public const string Name = "TempFileSystem";
+
         private readonly TempFileSystem temp;
 
         public FileSystemFixture()
@@ -84,11 +87,5 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
 
             return writableFile;
         }
-    }
-
-    [CollectionDefinition(Name)]
-    public sealed class TempFileSystemDependency : ICollectionFixture<FileSystemFixture>
-    {
-        public const string Name = "TempFileSystem";
     }
 }

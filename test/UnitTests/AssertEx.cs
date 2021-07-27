@@ -18,6 +18,14 @@ namespace Xunit
             return value;
         }
 
+        public static IEnumerable<T> ItemNotNull<T>(IEnumerable<T?> items)
+        {
+            foreach (var item in items)
+            {
+                yield return NotNull(item);
+            }
+        }
+
         public static void Equivalence<T>(IEnumerable<T> expected, IEnumerable<T> actual)
             where T : IComparable<T>
         {

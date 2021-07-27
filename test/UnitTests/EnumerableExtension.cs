@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace DotNetRu.Auditor.UnitTests
 {
-    internal static class ListExtension
+    internal static class EnumerableExtension
     {
-        public static int GetItemsHashCode<T>(this IEnumerable<T> list)
+        public static int GetItemsHashCode<T>(this IEnumerable<T> items)
         {
             var hash = new HashCode();
 
-            foreach (var item in list)
+            foreach (var item in items)
             {
                 hash.Add(item);
             }

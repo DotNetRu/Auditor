@@ -48,11 +48,31 @@ namespace DotNetRu.Auditor.Data.Xml
             return state;
         }
 
+        public void SerializeObject(Stream output, object? entity)
+        {
+            using var writer = new StreamWriter(output);
+
+            var state = SerializeObject(entity);
+            writer.Write(state);
+        }
+
         public object? DeserializeObject(string state)
         {
             using var buffer = new StringReader(state);
             using var reader = XmlReader.Create(buffer);
 
+            return DeserializeObject(reader);
+        }
+
+        public object? DeserializeObject(Stream input)
+        {
+            using var reader = XmlReader.Create(input);
+
+            return DeserializeObject(reader);
+        }
+
+        public object? DeserializeObject(XmlReader reader)
+        {
             return engine.Deserialize(reader);
         }
 

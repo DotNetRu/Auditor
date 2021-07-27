@@ -1,9 +1,13 @@
-﻿namespace DotNetRu.Auditor.Data
+﻿using System.IO;
+using System.Threading.Tasks;
+
+namespace DotNetRu.Auditor.Data
 {
     public interface IDataSerializer<T>
+        where T : IRecord
     {
-        string Serialize(T? entity);
+        Task SerializeAsync(Stream output, T? entity);
 
-        T? Deserialize(string state);
+        Task<T?> DeserializeAsync(Stream input);
     }
 }

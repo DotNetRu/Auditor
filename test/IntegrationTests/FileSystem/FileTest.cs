@@ -4,18 +4,19 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Storage.FileSystem;
+using DotNetRu.Auditor.UnitTests;
 using Xunit;
 
 namespace DotNetRu.Auditor.IntegrationTests.FileSystem
 {
-    [Collection(TempFileSystemDependency.Name)]
+    [Collection(FileSystemFixture.Name)]
     public sealed class FileTest
     {
         private readonly IReadOnlyList<IFile> files;
 
-        public FileTest(FileSystemFixture fileSystem)
+        public FileTest(FileSystemFixture fixture)
         {
-            files = fileSystem
+            files = fixture
                 .AllRoots
                 .Select(Initialize)
                 .ToList();
@@ -31,10 +32,9 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
                 await WriteAsync(file, content).ConfigureAwait(false);
 
                 await using var fileStream = await file.OpenForReadAsync().ConfigureAwait(false);
-                using var reader = new StreamReader(fileStream);
 
                 // Act
-                var actualContent = await reader.ReadLineAsync().ConfigureAwait(false);
+                var actualContent = await fileStream.ReadAllTextAsync().ConfigureAwait(false);
 
                 // Assert
                 Assert.Equal(content, actualContent);

@@ -6,14 +6,14 @@ using Xunit;
 
 namespace DotNetRu.Auditor.IntegrationTests.FileSystem
 {
-    [Collection(TempFileSystemDependency.Name)]
+    [Collection(FileSystemFixture.Name)]
     public sealed class DirectoryTest
     {
         private readonly IReadOnlyList<IDirectory> directories;
 
-        public DirectoryTest(FileSystemFixture fileSystem)
+        public DirectoryTest(FileSystemFixture fixture)
         {
-            directories = fileSystem.AllRoots;
+            directories = fixture.AllRoots;
         }
 
         [Fact]

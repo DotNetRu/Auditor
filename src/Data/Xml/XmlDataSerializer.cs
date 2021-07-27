@@ -1,17 +1,27 @@
-﻿using System.Xml.Serialization;
+﻿using System.IO;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace DotNetRu.Auditor.Data.Xml
 {
     internal sealed class XmlDataSerializer<T> : XmlCuteSerializer, IDataSerializer<T>
-        where T : class
+        where T : IRecord
     {
         public XmlDataSerializer(XmlAttributeOverrides? overrides = null)
             : base(typeof(T), overrides)
         {
         }
 
-        public string Serialize(T? entity) => SerializeObject(entity);
+        public Task SerializeAsync(Stream output, T? entity)
+        {
+            SerializeObject(output, entity);
+            return Task.CompletedTask;
+        }
 
-        public T? Deserialize(string state) => (T?)DeserializeObject(state);
+        public Task<T?> DeserializeAsync(Stream input)
+        {
+            var entity = (T?)DeserializeObject(input);
+            return Task.FromResult(entity);
+        }
     }
 }

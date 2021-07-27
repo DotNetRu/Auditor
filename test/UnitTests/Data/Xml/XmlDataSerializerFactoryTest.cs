@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DotNetRu.Auditor.Data;
-using DotNetRu.Auditor.Data.Model;
 using DotNetRu.Auditor.Data.Xml;
 using Xunit;
 
@@ -12,9 +11,10 @@ namespace DotNetRu.Auditor.UnitTests.Data.Xml
     public sealed class XmlDataSerializerFactoryTest
     {
         [Theory]
-        [MemberData(nameof(ModelTypesAsSingleArgument))]
+        [MemberData(nameof(ModelTypesAsGenericArgument))]
         [SuppressMessage("ReSharper", "xUnit1026")]
-        public void ShouldKnowAboutTheWholeModel2<T>(T _)
+        public void ShouldKnowAboutTheWholeModel<T>(T _)
+            where T : IRecord
         {
             // Act
             var builder = XmlDataSerializerFactory.CreateModelBuilder<T>();
@@ -24,19 +24,22 @@ namespace DotNetRu.Auditor.UnitTests.Data.Xml
             Assert.NotNull(builder.Build());
         }
 
-        public static TheoryData<object> ModelTypesAsSingleArgument => ModelTypes
+        [Fact]
+        public void ShouldHaveRecordTypes()
+        {
+            Assert.NotEmpty(ModelTypes);
+        }
+
+        public static TheoryData<object> ModelTypesAsGenericArgument => ModelTypes
             .Select(Activator.CreateInstance)
             .WhereNotNull()
             .ToTheoryData();
 
-        private static IReadOnlyList<Type> ModelTypes => new List<Type>
-        {
-            typeof(CommunityRecord),
-            typeof(MeetupRecord),
-            typeof(SpeakerRecord),
-            typeof(TalkRecord),
-            typeof(VenueRecord),
-            typeof(FriendRecord)
-        };
+        public static IReadOnlyList<Type> ModelTypes => typeof(XmlDataSerializerFactory)
+            .Assembly
+            .ExportedTypes
+            .Where(type => type.IsPublic)
+            .Where(type => type.GetInterfaces().Contains(typeof(IRecord)))
+            .ToList();
     }
 }

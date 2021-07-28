@@ -2,7 +2,7 @@
 
 namespace DotNetRu.Auditor.Data.Model
 {
-    public sealed class MeetupRecord : IRecord
+    public sealed class Meetup : IRecord
     {
         public string? Id { get; set; }
 
@@ -14,6 +14,6 @@ namespace DotNetRu.Auditor.Data.Model
 
         public string? VenueId { get; set; }
 
-        public List<MeetupSessionRecord> Sessions { get; } = new();
+        public List<MeetupSession> Sessions { get; } = new();
     }
 }

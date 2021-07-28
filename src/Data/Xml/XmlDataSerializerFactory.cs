@@ -24,12 +24,12 @@ namespace DotNetRu.Auditor.Data.Xml
         {
             object builder = typeof(T) switch
             {
-                Type type when type == typeof(CommunityRecord) => BuildCommunity(),
-                Type type when type == typeof(MeetupRecord) => BuildMeetup(),
-                Type type when type == typeof(SpeakerRecord) => BuildSpeaker(),
-                Type type when type == typeof(TalkRecord) => BuildTalk(),
-                Type type when type == typeof(VenueRecord) => BuildVenue(),
-                Type type when type == typeof(FriendRecord) => BuildFriend(),
+                Type type when type == typeof(Community) => BuildCommunity(),
+                Type type when type == typeof(Meetup) => BuildMeetup(),
+                Type type when type == typeof(Speaker) => BuildSpeaker(),
+                Type type when type == typeof(Talk) => BuildTalk(),
+                Type type when type == typeof(Venue) => BuildVenue(),
+                Type type when type == typeof(Friend) => BuildFriend(),
 
                 _ => throw new InvalidOperationException($"Unknown model type: {typeof(T).FullName}")
             };
@@ -44,7 +44,7 @@ namespace DotNetRu.Auditor.Data.Xml
             return new XmlDataSerializer<T>(overrides);
         }
 
-        private static XmlModelBuilder<CommunityRecord> BuildCommunity() => XmlModelBuilder<CommunityRecord>
+        private static XmlModelBuilder<Community> BuildCommunity() => XmlModelBuilder<Community>
             .Map("Community")
             .Property(community => community.Id, "Id")
             .Property(community => community.Name, "Name")
@@ -57,7 +57,7 @@ namespace DotNetRu.Auditor.Data.Xml
             .Property(community => community.MeetupComUrl, "MeetupComUrl")
             .Property(community => community.TimePadUrl, "TimePadUrl");
 
-        private static XmlModelBuilder<MeetupRecord> BuildMeetup() => XmlModelBuilder<MeetupRecord>
+        private static XmlModelBuilder<Meetup> BuildMeetup() => XmlModelBuilder<Meetup>
             .Map("Meetup")
             .Property(meetup => meetup.Id, "Id")
             .Property(meetup => meetup.Name, "Name")
@@ -72,7 +72,7 @@ namespace DotNetRu.Auditor.Data.Xml
                     .Property(session => session.EndTime, "EndTime");
             });
 
-        private static XmlModelBuilder<SpeakerRecord> BuildSpeaker() => XmlModelBuilder<SpeakerRecord>
+        private static XmlModelBuilder<Speaker> BuildSpeaker() => XmlModelBuilder<Speaker>
             .Map("Speaker")
             .Property(speaker => speaker.Id, "Id")
             .Property(speaker => speaker.Name, "Name")
@@ -85,7 +85,7 @@ namespace DotNetRu.Auditor.Data.Xml
             .Property(speaker => speaker.HabrUrl, "HabrUrl")
             .Property(speaker => speaker.GitHubUrl, "GitHubUrl");
 
-        private static XmlModelBuilder<TalkRecord> BuildTalk() => XmlModelBuilder<TalkRecord>
+        private static XmlModelBuilder<Talk> BuildTalk() => XmlModelBuilder<Talk>
             .Map("Talk")
             .Property(talk => talk.Id, "Id")
             .Collection(talk => talk.SpeakerIds, "SpeakerIds", "SpeakerId")
@@ -96,7 +96,7 @@ namespace DotNetRu.Auditor.Data.Xml
             .Property(talk => talk.SlidesUrl, "SlidesUrl")
             .Property(talk => talk.VideoUrl, "VideoUrl");
 
-        private static XmlModelBuilder<VenueRecord> BuildVenue() => XmlModelBuilder<VenueRecord>
+        private static XmlModelBuilder<Venue> BuildVenue() => XmlModelBuilder<Venue>
             .Map("Venue")
             .Property(venue => venue.Id, "Id")
             .Property(venue => venue.Name, "Name")
@@ -104,7 +104,7 @@ namespace DotNetRu.Auditor.Data.Xml
             .Property(venue => venue.Address, "Address")
             .Property(venue => venue.MapUrl, "MapUrl");
 
-        private static XmlModelBuilder<FriendRecord> BuildFriend() => XmlModelBuilder<FriendRecord>
+        private static XmlModelBuilder<Friend> BuildFriend() => XmlModelBuilder<Friend>
             .Map("Friend")
             .Property(friend => friend.Id, "Id")
             .Property(friend => friend.Name, "Name")

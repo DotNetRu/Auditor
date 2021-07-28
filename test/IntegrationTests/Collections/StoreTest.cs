@@ -21,7 +21,7 @@ namespace DotNetRu.Auditor.IntegrationTests.Collections
         public async Task ShouldReadAllCommunities()
         {
             // Act
-            var communities = await session.QueryAsync<CommunityRecord>().ToListAsync().ConfigureAwait(false);
+            var communities = await session.QueryAsync<Community>().ToListAsync().ConfigureAwait(false);
 
             // Assert
             var singleCommunity = Assert.Single(communities);

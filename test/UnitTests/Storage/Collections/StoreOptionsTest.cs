@@ -45,12 +45,12 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
 
         private static IReadOnlyDictionary<Type, string> NamedRecords => new Dictionary<Type, string>
         {
-            { typeof(CommunityRecord), "communities" },
-            { typeof(FriendRecord), "friends" },
-            { typeof(MeetupRecord), "meetups" },
-            { typeof(SpeakerRecord), "speakers" },
-            { typeof(TalkRecord), "talks" },
-            { typeof(VenueRecord), "venues" }
+            { typeof(Community), "communities" },
+            { typeof(Friend), "friends" },
+            { typeof(Meetup), "meetups" },
+            { typeof(Speaker), "speakers" },
+            { typeof(Talk), "talks" },
+            { typeof(Venue), "venues" }
         };
     }
 }

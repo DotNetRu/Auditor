@@ -8,11 +8,11 @@ namespace DotNetRu.Auditor.Storage.Collections
 
         private static string LowerPlural(Type recordType)
         {
-            var typeName = recordType.Name.Replace("Record", String.Empty).ToLowerInvariant();
+            var typeName = recordType.Name.ToLowerInvariant();
 
             if (typeName.EndsWith("y", StringComparison.Ordinal))
             {
-                typeName = typeName[0..^1] + "ies";
+                typeName = typeName[..^1] + "ies";
             }
             else
             {

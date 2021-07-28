@@ -25,14 +25,14 @@ namespace DotNetRu.Auditor.IntegrationTests.Collections
 
         private static async Task<IStore> InitializeAsync(IDirectory root)
         {
-            var community = new CommunityRecord
+            var community = new Community
             {
                 Id = "AllDotNet",
                 Name = "AllDotNet Community"
             };
 
             var serializerFactory = new XmlDataSerializerFactory();
-            var serializer = serializerFactory.Create<CommunityRecord>();
+            var serializer = serializerFactory.Create<Community>();
 
             await CreateFileAsync(root, community, serializer).ConfigureAwait(false);
 
@@ -42,8 +42,8 @@ namespace DotNetRu.Auditor.IntegrationTests.Collections
 
         private static async Task CreateFileAsync(
             IDirectory root,
-            CommunityRecord community,
-            IDataSerializer<CommunityRecord> serializer)
+            Community community,
+            IDataSerializer<Community> serializer)
         {
             if (community.Id == null)
             {

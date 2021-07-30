@@ -6,6 +6,7 @@ jobs:
   publish:
 
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     env:
       version: 0.${{ github.run_number }}

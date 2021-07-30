@@ -36,7 +36,7 @@ namespace DotNetRu.Auditor.IntegrationTests.Collections
 
             await CreateFileAsync(root, community, serializer).ConfigureAwait(false);
 
-            var store = await AuditStore.OpenAsync(root);
+            var store = await AuditStore.OpenAsync(root).ConfigureAwait(false);
             return store;
         }
 
@@ -57,7 +57,8 @@ namespace DotNetRu.Auditor.IntegrationTests.Collections
             var writableFile = await file.RequestWriteAccessAsync().ConfigureAwait(false);
             writableFile = AssertEx.NotNull(writableFile);
 
-            await using (var fileStream = await writableFile.OpenForWriteAsync().ConfigureAwait(false))
+            var fileStream = await writableFile.OpenForWriteAsync().ConfigureAwait(false);
+            await using (fileStream.ConfigureAwait(false))
             {
                 await serializer.SerializeAsync(fileStream, community).ConfigureAwait(false);
             }

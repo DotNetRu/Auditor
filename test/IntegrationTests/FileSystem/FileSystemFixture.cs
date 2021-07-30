@@ -76,10 +76,14 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
             var writableFile = await file.RequestWriteAccessAsync().ConfigureAwait(false);
             writableFile = AssertEx.NotNull(writableFile);
 
-            await using (var fileStream = await writableFile.OpenForWriteAsync().ConfigureAwait(false))
-            await using (var fileWriter = new StreamWriter(fileStream))
+            var fileStream = await writableFile.OpenForWriteAsync().ConfigureAwait(false);
+            await using (fileStream.ConfigureAwait(false))
             {
-                await fileWriter.WriteAsync(file.FullName).ConfigureAwait(false);
+                var fileWriter = new StreamWriter(fileStream);
+                await using (fileWriter.ConfigureAwait(false))
+                {
+                    await fileWriter.WriteAsync(file.FullName).ConfigureAwait(false);
+                }
             }
 
             fileExists = await file.ExistsAsync().ConfigureAwait(false);

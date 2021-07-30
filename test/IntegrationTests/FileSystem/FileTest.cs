@@ -31,13 +31,15 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
                 const string content = "abc 123";
                 await WriteAsync(file, content).ConfigureAwait(false);
 
-                await using var fileStream = await file.OpenForReadAsync().ConfigureAwait(false);
+                var fileStream = await file.OpenForReadAsync().ConfigureAwait(false);
+                await using (fileStream.ConfigureAwait(false))
+                {
+                    // Act
+                    var actualContent = await fileStream.ReadAllTextAsync().ConfigureAwait(false);
 
-                // Act
-                var actualContent = await fileStream.ReadAllTextAsync().ConfigureAwait(false);
-
-                // Assert
-                Assert.Equal(content, actualContent);
+                    // Assert
+                    Assert.Equal(content, actualContent);
+                }
             }
         }
 
@@ -129,10 +131,15 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
         {
             var writable = await GetWritable(file).ConfigureAwait(false);
 
-            await using var fileStream = await writable.OpenForWriteAsync().ConfigureAwait(false);
-            await using var fileWriter = new StreamWriter(fileStream);
-
-            await fileWriter.WriteAsync(content).ConfigureAwait(false);
+            var fileStream = await writable.OpenForWriteAsync().ConfigureAwait(false);
+            await using (fileStream.ConfigureAwait(false))
+            {
+                var fileWriter = new StreamWriter(fileStream);
+                await using (fileWriter.ConfigureAwait(false))
+                {
+                    await fileWriter.WriteAsync(content).ConfigureAwait(false);
+                }
+            }
         }
 
         private static IFile Initialize(IDirectory root)

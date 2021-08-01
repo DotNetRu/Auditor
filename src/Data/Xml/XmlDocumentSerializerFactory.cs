@@ -6,21 +6,21 @@ using IEntitySerializer = System.Object;
 
 namespace DotNetRu.Auditor.Data.Xml
 {
-    public sealed class XmlDataSerializerFactory : IDataSerializerFactory
+    public sealed class XmlDocumentSerializerFactory : IDocumentSerializerFactory
     {
         private static readonly ConcurrentDictionary<Type, IEntitySerializer> Cache = new();
 
-        public IDataSerializer<T> Create<T>()
-            where T : IRecord
+        public IDocumentSerializer<T> Create<T>()
+            where T : IDocument
         {
             // NOTE: When we use XmlSerializer with overrides, framework cannot reuse generated assemblies.
             // Therefore, to avoid memory leaks, we should cache all serializers with the same overrides.
             var serializer = Cache.GetOrAdd(typeof(T), _ => Build<T>());
-            return (IDataSerializer<T>)serializer;
+            return (IDocumentSerializer<T>)serializer;
         }
 
         internal static XmlModelBuilder<T> CreateModelBuilder<T>()
-            where T : IRecord
+            where T : IDocument
         {
             object builder = typeof(T) switch
             {
@@ -37,11 +37,11 @@ namespace DotNetRu.Auditor.Data.Xml
             return (XmlModelBuilder<T>)builder;
         }
 
-        private static IDataSerializer<T> Build<T>()
-            where T : IRecord
+        private static IDocumentSerializer<T> Build<T>()
+            where T : IDocument
         {
             var overrides = CreateModelBuilder<T>().Build();
-            return new XmlDataSerializer<T>(overrides);
+            return new XmlDocumentSerializer<T>(overrides);
         }
 
         private static XmlModelBuilder<Community> BuildCommunity() => XmlModelBuilder<Community>

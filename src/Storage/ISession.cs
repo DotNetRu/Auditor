@@ -4,24 +4,25 @@ using DotNetRu.Auditor.Data;
 
 namespace DotNetRu.Auditor.Storage
 {
-    // TDO: Add blob access
+    // TDO: Add Attachments and Blobs
     public interface ISession
     {
         Task<T?> LoadAsync<T>(string id)
-            where T : IRecord;
+            where T : IDocument;
 
         Task<IReadOnlyDictionary<string, T>> LoadAsync<T>(IReadOnlyList<string> ids)
-            where T : IRecord;
+            where T : IDocument;
 
         public IAsyncEnumerable<T> QueryAsync<T>()
-            where T : IRecord;
+            where T : IDocument;
 
         // TDO: Write methods
-        // void Save<T>(T record) // Add? Store? Create? Register? Track?
-        //     where T : IRecord;
+        // void StoreAsync<T>(T document) // Save? Add? Store? Create? Register? Track?
+        //     where T : IDocument;
         //
+        // Task Delete<T>(T document);
         // Task Delete(string id); // Remove?
         //
-        // Task CommitChangesAsync(CancellationToken token = default);
+        // Task SaveChangesAsync(CancellationToken token = default);
     }
 }

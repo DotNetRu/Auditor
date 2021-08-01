@@ -1,6 +1,6 @@
 ﻿namespace DotNetRu.Auditor.Data.Model
 {
-    public sealed class Speaker : IRecord
+    public sealed class Speaker : IDocument
     {
         public string? Id { get; set; }
 

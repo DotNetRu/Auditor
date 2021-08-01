@@ -4,17 +4,17 @@ using System.Xml.Serialization;
 
 namespace DotNetRu.Auditor.Data.Xml
 {
-    internal sealed class XmlDataSerializer<T> : XmlCuteSerializer, IDataSerializer<T>
-        where T : IRecord
+    internal sealed class XmlDocumentSerializer<T> : XmlCuteSerializer, IDocumentSerializer<T>
+        where T : IDocument
     {
-        public XmlDataSerializer(XmlAttributeOverrides? overrides = null)
+        public XmlDocumentSerializer(XmlAttributeOverrides? overrides = null)
             : base(typeof(T), overrides)
         {
         }
 
-        public Task SerializeAsync(Stream output, T? entity)
+        public Task SerializeAsync(Stream output, T? document)
         {
-            SerializeObject(output, entity);
+            SerializeObject(output, document);
             return Task.CompletedTask;
         }
 

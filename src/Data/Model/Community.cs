@@ -1,6 +1,6 @@
 ﻿namespace DotNetRu.Auditor.Data.Model
 {
-    public sealed class Community : IRecord
+    public sealed class Community : IDocument
     {
         public string? Id { get; set; }
 

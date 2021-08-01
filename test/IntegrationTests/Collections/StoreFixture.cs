@@ -31,7 +31,7 @@ namespace DotNetRu.Auditor.IntegrationTests.Collections
                 Name = "AllDotNet Community"
             };
 
-            var serializerFactory = new XmlDataSerializerFactory();
+            var serializerFactory = new XmlDocumentSerializerFactory();
             var serializer = serializerFactory.Create<Community>();
 
             await CreateFileAsync(root, community, serializer).ConfigureAwait(false);
@@ -43,7 +43,7 @@ namespace DotNetRu.Auditor.IntegrationTests.Collections
         private static async Task CreateFileAsync(
             IDirectory root,
             Community community,
-            IDataSerializer<Community> serializer)
+            IDocumentSerializer<Community> serializer)
         {
             if (community.Id == null)
             {

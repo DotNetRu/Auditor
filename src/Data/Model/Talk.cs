@@ -2,7 +2,7 @@
 
 namespace DotNetRu.Auditor.Data.Model
 {
-    public sealed class Talk : IRecord
+    public sealed class Talk : IDocument
     {
         public string? Id { get; set; }
 

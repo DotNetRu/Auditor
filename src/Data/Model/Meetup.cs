@@ -2,7 +2,7 @@
 
 namespace DotNetRu.Auditor.Data.Model
 {
-    public sealed class Meetup : IRecord
+    public sealed class Meetup : IDocument
     {
         public string? Id { get; set; }
 

@@ -22,10 +22,10 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Xml
 
             await new[]
                 {
-                    KnownRecordId,
-                    KnownRecordId + "-2"
+                    KnownId,
+                    KnownId + "-2"
                 }
-                .Select(id => root.WriteToXmlDirectoryCollectionAsync(id, KnownRecordId))
+                .Select(id => root.WriteToXmlDirectoryCollectionAsync(id, KnownId))
                 .WhenAll()
                 .ConfigureAwait(false);
 

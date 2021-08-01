@@ -9,7 +9,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
 {
     public abstract class CollectionTest
     {
-        protected const string KnownRecordId = "passwd";
+        protected const string KnownId = "passwd";
 
         private readonly Collection collection;
 
@@ -29,31 +29,31 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
         }
 
         [Fact]
-        public async Task ShouldLoadSingleRecord()
+        public async Task ShouldLoadSingle()
         {
             // Act
-            var secret = await collection.LoadAsync(KnownRecordId, DeserializeSecret).ConfigureAwait(false);
+            var secret = await collection.LoadAsync(KnownId, DeserializeSecret).ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(secret);
-            Assert.Equal(KnownRecordId, secret?.Id);
+            Assert.Equal(KnownId, secret?.Id);
         }
 
         [Fact]
-        public async Task ShouldReturnDefaultWhenLoadNotExistingSingleRecord()
+        public async Task ShouldReturnDefaultWhenLoadNotExistingSingle()
         {
             // Arrange
-            const string unknownRecordId = "shadow";
+            const string unknownId = "shadow";
 
             // Act
-            var secret = await collection.LoadAsync(unknownRecordId, DeserializeSecret).ConfigureAwait(false);
+            var secret = await collection.LoadAsync(unknownId, DeserializeSecret).ConfigureAwait(false);
 
             // Assert
             Assert.Null(secret);
         }
 
         [Fact]
-        public async Task ShouldLoadManyRecords()
+        public async Task ShouldLoadMany()
         {
             // Act
             var secretList = await collection.QueryAsync(DeserializeSecret).ToListAsync().ConfigureAwait(false);
@@ -61,11 +61,11 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
             // Assert
             Assert.True(secretList.Count > 1);
             var secrets = AssertEx.ItemNotNull(secretList);
-            Assert.All(secrets, secret => Assert.StartsWith(KnownRecordId, AssertEx.NotNull(secret.Id)));
+            Assert.All(secrets, secret => Assert.StartsWith(KnownId, AssertEx.NotNull(secret.Id)));
         }
 
         [Fact]
-        public async Task ShouldSkipRecordWhenCantDeserialize()
+        public async Task ShouldSkipWhenCantDeserialize()
         {
             // Arrange
             var secretCount = 0;
@@ -78,7 +78,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
             // Assert
             var singleSecret = Assert.Single(secretList);
             var secret = AssertEx.NotNull(singleSecret);
-            Assert.StartsWith(KnownRecordId, AssertEx.NotNull(secret.Id));
+            Assert.StartsWith(KnownId, AssertEx.NotNull(secret.Id));
         }
 
         private static async Task<Secret?> DeserializeSecret(Stream stream)
@@ -87,7 +87,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
             return new Secret(state);
         }
 
-        private sealed record Secret(string? Id) : IRecord
+        private sealed record Secret(string? Id) : IDocument
         {
             public string? Name => Id;
         }

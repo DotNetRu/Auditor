@@ -11,7 +11,7 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
     [CollectionDefinition(Name)]
     public sealed class FileSystemFixture : ICollectionFixture<FileSystemFixture>, IDisposable
     {
-        public const string Name = "TempFileSystem";
+        public const string Name = nameof(FileSystemFixture);
 
         private readonly TempFileSystem temp;
 

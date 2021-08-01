@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Data;
+using DotNetRu.Auditor.Storage;
 using DotNetRu.Auditor.Storage.Collections;
 using Moq;
 using Xunit;
@@ -14,7 +15,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
     {
         private const string SomeId = nameof(SomeId);
         private static readonly SessionOptions DefaultOptions = new();
-        private static readonly IDataSerializerFactory NoFactory = new Mock<IDataSerializerFactory>(MockBehavior.Strict).Object;
+        private static readonly IDocumentSerializerFactory NoFactory = new Mock<IDocumentSerializerFactory>(MockBehavior.Strict).Object;
 
         [Fact]
         public async Task ShouldLoadNullWhenCollectionNotFound()
@@ -66,7 +67,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
             return false;
         }
 
-        private sealed record Secret(string? Id) : IRecord
+        private sealed record Secret(string? Id) : IDocument
         {
             public string? Name => Id;
         }

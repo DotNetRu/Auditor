@@ -1,4 +1,4 @@
-﻿namespace DotNetRu.Auditor.Storage.Collections
+﻿namespace DotNetRu.Auditor.Storage
 {
     public sealed class SessionOptions
     {

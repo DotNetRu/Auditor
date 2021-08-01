@@ -1,6 +1,6 @@
 ﻿namespace DotNetRu.Auditor.Data.Model
 {
-    public sealed class Venue : IRecord
+    public sealed class Venue : IDocument
     {
         public string? Id { get; set; }
 

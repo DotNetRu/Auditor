@@ -12,12 +12,12 @@ namespace DotNetRu.Auditor.Storage.Collections
 
         private readonly SessionOptions options;
         private readonly CollectionResolver tryResolveCollection;
-        private readonly IDataSerializerFactory serializerFactory;
+        private readonly IDocumentSerializerFactory serializerFactory;
 
         public Session(
             SessionOptions options,
             CollectionResolver tryResolveCollection,
-            IDataSerializerFactory serializerFactory)
+            IDocumentSerializerFactory serializerFactory)
         {
             this.options = options;
             this.tryResolveCollection = tryResolveCollection;
@@ -25,7 +25,7 @@ namespace DotNetRu.Auditor.Storage.Collections
         }
 
         public Task<T?> LoadAsync<T>(string id)
-            where T : IRecord
+            where T : IDocument
         {
             if (!tryResolveCollection(typeof(T), out var collection))
             {
@@ -33,12 +33,11 @@ namespace DotNetRu.Auditor.Storage.Collections
             }
 
             var serializer = serializerFactory.Create<T>();
-            var record = collection.LoadAsync(id, serializer.DeserializeAsync);
-            return record;
+            return collection.LoadAsync(id, serializer.DeserializeAsync);
         }
 
         public async Task<IReadOnlyDictionary<string, T>> LoadAsync<T>(IReadOnlyList<string> ids)
-            where T : IRecord
+            where T : IDocument
         {
             if (!tryResolveCollection(typeof(T), out var collection))
             {
@@ -46,22 +45,22 @@ namespace DotNetRu.Auditor.Storage.Collections
             }
 
             var serializer = serializerFactory.Create<T>();
-            var records = new Dictionary<string, T>(ids.Count);
+            var documents = new Dictionary<string, T>(ids.Count);
 
             foreach (var id in ids)
             {
-                var record = await collection.LoadAsync(id, serializer.DeserializeAsync).ConfigureAwait(false);
-                if (record != null && record.Id != null)
+                var document = await collection.LoadAsync(id, serializer.DeserializeAsync).ConfigureAwait(false);
+                if (document != null && document.Id != null)
                 {
-                    records.Add(record.Id, record);
+                    documents.Add(document.Id, document);
                 }
             }
 
-            return records;
+            return documents;
         }
 
         public IAsyncEnumerable<T> QueryAsync<T>()
-            where T : IRecord
+            where T : IDocument
         {
             if (!tryResolveCollection(typeof(T), out var collection))
             {
@@ -69,8 +68,8 @@ namespace DotNetRu.Auditor.Storage.Collections
             }
 
             var serializer = serializerFactory.Create<T>();
-            var records = collection.QueryAsync(serializer.DeserializeAsync);
-            return records;
+            var documents = collection.QueryAsync(serializer.DeserializeAsync);
+            return documents;
         }
     }
 }

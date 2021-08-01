@@ -14,10 +14,10 @@ namespace DotNetRu.Auditor.UnitTests.Data.Xml
         [MemberData(nameof(ModelTypesAsGenericArgument))]
         [SuppressMessage("ReSharper", "xUnit1026")]
         public void ShouldKnowAboutTheWholeModel<T>(T _)
-            where T : IRecord
+            where T : IDocument
         {
             // Act
-            var builder = XmlDataSerializerFactory.CreateModelBuilder<T>();
+            var builder = XmlDocumentSerializerFactory.CreateModelBuilder<T>();
 
             // Assert
             Assert.NotNull(builder);
@@ -25,7 +25,7 @@ namespace DotNetRu.Auditor.UnitTests.Data.Xml
         }
 
         [Fact]
-        public void ShouldHaveRecordTypes()
+        public void ShouldHaveModelTypes()
         {
             Assert.NotEmpty(ModelTypes);
         }
@@ -35,11 +35,11 @@ namespace DotNetRu.Auditor.UnitTests.Data.Xml
             .WhereNotNull()
             .ToTheoryData();
 
-        public static IReadOnlyList<Type> ModelTypes => typeof(XmlDataSerializerFactory)
+        public static IReadOnlyList<Type> ModelTypes => typeof(XmlDocumentSerializerFactory)
             .Assembly
             .ExportedTypes
             .Where(type => type.IsPublic)
-            .Where(type => type.GetInterfaces().Contains(typeof(IRecord)))
+            .Where(type => type.GetInterfaces().Contains(typeof(IDocument)))
             .ToList();
     }
 }

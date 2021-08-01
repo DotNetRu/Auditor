@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace DotNetRu.Auditor.Data
 {
-    public interface IDataSerializer<T>
-        where T : IRecord
+    public interface IDocumentSerializer<T>
+        where T : IDocument
     {
-        Task SerializeAsync(Stream output, T? entity);
+        Task SerializeAsync(Stream output, T? document);
 
         Task<T?> DeserializeAsync(Stream input);
     }

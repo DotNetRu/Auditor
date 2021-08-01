@@ -1,6 +1,6 @@
 ﻿namespace DotNetRu.Auditor.Data
 {
-    public interface IRecord
+    public interface IDocument
     {
         public string? Id { get; }
 

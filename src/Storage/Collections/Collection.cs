@@ -9,7 +9,7 @@ namespace DotNetRu.Auditor.Storage.Collections
     internal abstract class Collection
     {
         public delegate Task<T?> IndexDeserializer<T>(Stream stream)
-            where T : IRecord;
+            where T : IDocument;
 
         protected readonly IDirectory Directory;
 
@@ -21,7 +21,7 @@ namespace DotNetRu.Auditor.Storage.Collections
         public string Name => Directory.Name;
 
         public async Task<T?> LoadAsync<T>(string id, IndexDeserializer<T> deserializer)
-            where T : IRecord
+            where T : IDocument
         {
             var indexFile = GetIndexFileAsync(id);
             var exists = await indexFile.ExistsAsync().ConfigureAwait(false);
@@ -30,20 +30,20 @@ namespace DotNetRu.Auditor.Storage.Collections
                 return default;
             }
 
-            var record = await DeserializeIndex(indexFile, deserializer).ConfigureAwait(false);
-            return record;
+            var document = await DeserializeIndex(indexFile, deserializer).ConfigureAwait(false);
+            return document;
         }
 
         public async IAsyncEnumerable<T> QueryAsync<T>(IndexDeserializer<T> deserializer)
-            where T : IRecord
+            where T : IDocument
         {
             await foreach (var indexFile in EnumerateIndexFilesAsync())
             {
-                var record = await DeserializeIndex(indexFile, deserializer).ConfigureAwait(false);
+                var document = await DeserializeIndex(indexFile, deserializer).ConfigureAwait(false);
 
-                if (record != null)
+                if (document != null)
                 {
-                    yield return record;
+                    yield return document;
                 }
             }
         }
@@ -53,11 +53,11 @@ namespace DotNetRu.Auditor.Storage.Collections
         protected abstract IAsyncEnumerable<IFile> EnumerateIndexFilesAsync();
 
         private static async Task<T?> DeserializeIndex<T>(IFile indexFile, IndexDeserializer<T> deserializer)
-            where T : IRecord
+            where T : IDocument
         {
             await using var indexStream = await indexFile.OpenForReadAsync().ConfigureAwait(false);
-            var record = await deserializer(indexStream).ConfigureAwait(false);
-            return record;
+            var document = await deserializer(indexStream).ConfigureAwait(false);
+            return document;
         }
     }
 }

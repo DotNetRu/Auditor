@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DotNetRu.Auditor.Data.Model;
+using DotNetRu.Auditor.Storage;
 using DotNetRu.Auditor.Storage.Collections;
 using DotNetRu.Auditor.UnitTests.Data.Xml;
 using Xunit;
@@ -18,32 +19,32 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
         }
 
         [Theory]
-        [MemberData(nameof(RecordsWithName))]
-        public void ShouldMapCollectionName(Type recordType, string expectedCollectionName)
+        [MemberData(nameof(TypeWithName))]
+        public void ShouldMapCollectionName(Type type, string expectedCollectionName)
         {
             // Act
-            var actualCollectionName = options.MapCollectionName(recordType);
+            var actualCollectionName = options.MapCollectionName(type);
 
             // Assert
             Assert.Equal(expectedCollectionName, actualCollectionName);
         }
 
         [Fact]
-        public void ShouldCheckAllRecords()
+        public void ShouldHaveAllTypes()
         {
             // Arrange
-            var allRecordTypes = XmlDataSerializerFactoryTest.ModelTypes;
+            var allModelTypes = XmlDataSerializerFactoryTest.ModelTypes;
 
             // Act
-            var namedRecordType = NamedRecords.Select(pair => pair.Key);
+            var knownModelTypes = NamedTypes.Select(pair => pair.Key);
 
             // Assert
-            Assert.Equal(allRecordTypes, namedRecordType);
+            Assert.Equal(allModelTypes, knownModelTypes);
         }
 
-        public static TheoryData<Type, string> RecordsWithName => NamedRecords.ToTheoryData();
+        public static TheoryData<Type, string> TypeWithName => NamedTypes.ToTheoryData();
 
-        private static IReadOnlyDictionary<Type, string> NamedRecords => new Dictionary<Type, string>
+        private static IReadOnlyDictionary<Type, string> NamedTypes => new Dictionary<Type, string>
         {
             { typeof(Community), "communities" },
             { typeof(Friend), "friends" },

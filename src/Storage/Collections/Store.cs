@@ -10,7 +10,7 @@ namespace DotNetRu.Auditor.Storage.Collections
     // TDO: Add integration tests
     internal sealed class Store : IStore
     {
-        private readonly IDataSerializerFactory serializerFactory = new XmlDataSerializerFactory();
+        private readonly IDocumentSerializerFactory serializerFactory = new XmlDocumentSerializerFactory();
         private readonly StoreOptions options;
         private readonly IReadOnlyDictionary<string, Collection> collections;
 

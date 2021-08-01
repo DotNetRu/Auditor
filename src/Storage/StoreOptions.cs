@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace DotNetRu.Auditor.Storage.Collections
+namespace DotNetRu.Auditor.Storage
 {
     public sealed class StoreOptions
     {
         public Func<Type, string> MapCollectionName { get; set; } = LowerPlural;
 
-        private static string LowerPlural(Type recordType)
+        private static string LowerPlural(Type type)
         {
-            var typeName = recordType.Name.ToLowerInvariant();
+            var typeName = type.Name.ToLowerInvariant();
 
             if (typeName.EndsWith("y", StringComparison.Ordinal))
             {

@@ -3,7 +3,7 @@
 namespace DotNetRu.Auditor.Data.Model
 {
     [SuppressMessage("Naming", "CA1716: Identifiers should not match keywords")]
-    public sealed class Friend : IRecord
+    public sealed class Friend : IDocument
     {
         public string? Id { get; set; }
 

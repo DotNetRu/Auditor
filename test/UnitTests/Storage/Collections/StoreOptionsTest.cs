@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DotNetRu.Auditor.Data.Model;
 using DotNetRu.Auditor.Storage;
-using DotNetRu.Auditor.Storage.Collections;
 using DotNetRu.Auditor.UnitTests.Data.Xml;
 using Xunit;
 

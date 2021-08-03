@@ -31,7 +31,7 @@ namespace DotNetRu.Auditor.Storage.FileSystem.PathEngine
 
         public async IAsyncEnumerable<IDirectory> EnumerateDirectoriesAsync()
         {
-            await foreach (var directoryFullName in fileSystem.EnumerateDirectoriesAsync(FullName))
+            await foreach (var directoryFullName in fileSystem.EnumerateDirectoriesAsync(FullName).ConfigureAwait(false))
             {
                 yield return new PathDirectory(directoryFullName, fileSystem);
             }
@@ -39,7 +39,7 @@ namespace DotNetRu.Auditor.Storage.FileSystem.PathEngine
 
         public async IAsyncEnumerable<IFile> EnumerateFilesAsync()
         {
-            await foreach (var fileFullName in fileSystem.EnumerateFilesAsync(FullName))
+            await foreach (var fileFullName in fileSystem.EnumerateFilesAsync(FullName).ConfigureAwait(false))
             {
                 yield return new PathFile(fileFullName, fileSystem);
             }

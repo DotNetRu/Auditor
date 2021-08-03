@@ -1,6 +1,4 @@
-﻿using DotNetRu.Auditor.Storage.Collections;
-
-namespace DotNetRu.Auditor.Storage
+﻿namespace DotNetRu.Auditor.Storage
 {
     public interface IStore
     {

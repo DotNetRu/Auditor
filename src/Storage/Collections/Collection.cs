@@ -37,7 +37,7 @@ namespace DotNetRu.Auditor.Storage.Collections
         public async IAsyncEnumerable<T> QueryAsync<T>(IndexDeserializer<T> deserializer)
             where T : IDocument
         {
-            await foreach (var indexFile in EnumerateIndexFilesAsync())
+            await foreach (var indexFile in EnumerateIndexFilesAsync().ConfigureAwait(false))
             {
                 var document = await DeserializeIndex(indexFile, deserializer).ConfigureAwait(false);
 

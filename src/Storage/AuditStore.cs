@@ -21,7 +21,7 @@ namespace DotNetRu.Auditor.Storage
         {
             var binder = new CollectionBinder(CreateMatcher);
             var storeCollections = new List<Collection>();
-            await foreach (var collection in binder.ScanAsync(databaseDirectory))
+            await foreach (var collection in binder.ScanAsync(databaseDirectory).ConfigureAwait(false))
             {
                 storeCollections.Add(collection);
             }

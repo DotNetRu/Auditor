@@ -9,5 +9,10 @@ namespace DotNetRu.Auditor.Data.Model
         public DateTime? StartTime { get; set; }
 
         public DateTime? EndTime { get; set; }
+
+        public int GetContentChecksum()
+        {
+            return HashCode.Combine(TalkId, StartTime, EndTime);
+        }
     }
 }

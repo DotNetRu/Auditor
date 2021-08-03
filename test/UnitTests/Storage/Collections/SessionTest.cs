@@ -70,6 +70,8 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
         private sealed record Secret(string? Id) : IDocument
         {
             public string? Name => Id;
+
+            public int GetContentChecksum() => GetHashCode();
         }
     }
 }

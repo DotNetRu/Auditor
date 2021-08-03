@@ -1,4 +1,6 @@
-﻿namespace DotNetRu.Auditor.Data.Model
+﻿using System;
+
+namespace DotNetRu.Auditor.Data.Model
 {
     public sealed class Speaker : IDocument
     {
@@ -21,5 +23,11 @@
         public string? HabrUrl { get; set; }
 
         public string? GitHubUrl { get; set; }
+
+        public int GetContentChecksum()
+        {
+            var urlChecksum = HashCode.Combine(BlogUrl, ContactsUrl, TwitterUrl, HabrUrl, GitHubUrl);
+            return HashCode.Combine(Id, Name, CompanyName, CompanyUrl, Description, urlChecksum);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DotNetRu.Auditor.Data.Model
 {
@@ -19,5 +20,12 @@ namespace DotNetRu.Auditor.Data.Model
         public string? SlidesUrl { get; set; }
 
         public string? VideoUrl { get; set; }
+
+        public int GetContentChecksum()
+        {
+            var speakerChecksum = SpeakerIds.GetItemsHashCode();
+            var seeChecksum = SeeAlsoTalkIds.GetItemsHashCode();
+            return HashCode.Combine(Id, Name, speakerChecksum, Description, seeChecksum, CodeUrl, SlidesUrl, VideoUrl);
+        }
     }
 }

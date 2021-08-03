@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DotNetRu.Auditor.Data.Model
 {
@@ -12,5 +13,10 @@ namespace DotNetRu.Auditor.Data.Model
         public string? Url { get; set; }
 
         public string? Description { get; set; }
+
+        public int GetContentChecksum()
+        {
+            return HashCode.Combine(Id, Name, Url, Description);
+        }
     }
 }

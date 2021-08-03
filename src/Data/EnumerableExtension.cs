@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -6,6 +7,18 @@ namespace DotNetRu.Auditor.Data
 {
     public static class EnumerableExtension
     {
+        public static int GetItemsHashCode<T>(this IEnumerable<T> items)
+        {
+            var hash = new HashCode();
+
+            foreach (var item in items)
+            {
+                hash.Add(item);
+            }
+
+            return hash.ToHashCode();
+        }
+
         public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source)
             where T : class
         {

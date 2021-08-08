@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Data;
+using DotNetRu.Auditor.Data.Model;
 using DotNetRu.Auditor.Storage;
 using DotNetRu.Auditor.Storage.Collections;
 using Moq;
@@ -24,7 +25,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
             var session = CreateEmptySession();
 
             // Act
-            var secret = await session.LoadAsync<Secret>(SomeId).ConfigureAwait(false);
+            var secret = await session.LoadAsync<Community>(SomeId).ConfigureAwait(false);
 
             // Assert
             Assert.Null(secret);
@@ -37,7 +38,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
             var session = CreateEmptySession();
 
             // Act
-            var secrets = await session.LoadAsync<Secret>(new[] { SomeId }).ConfigureAwait(false);
+            var secrets = await session.LoadAsync<Community>(new[] { SomeId }).ConfigureAwait(false);
 
             // Assert
             Assert.Empty(secrets);
@@ -50,7 +51,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
             var session = CreateEmptySession();
 
             // Act
-            var secrets = await session.QueryAsync<Secret>().ToListAsync().ConfigureAwait(false);
+            var secrets = await session.QueryAsync<Community>().ToListAsync().ConfigureAwait(false);
 
             // Assert
             Assert.Empty(secrets);
@@ -58,20 +59,13 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
 
         private static Session CreateEmptySession()
         {
-            return new Session(DefaultOptions, NoCollection, NoFactory);
+            return new(DefaultOptions, NoCollection);
         }
 
-        private static bool NoCollection(Type collectionType, [NotNullWhen(true)] out Collection? collection)
+        private static bool NoCollection(Type collectionType, [NotNullWhen(true)] out IDocumentCollection? collection)
         {
             collection = default;
             return false;
-        }
-
-        private sealed record Secret(string? Id) : IDocument
-        {
-            public string? Name => Id;
-
-            public int GetContentChecksum() => GetHashCode();
         }
     }
 }

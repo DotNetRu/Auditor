@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using DotNetRu.Auditor.Data;
 using DotNetRu.Auditor.Storage.FileSystem;
 
 namespace DotNetRu.Auditor.Storage.Collections.Xml
 {
-    internal sealed class XmlFileCollection : Collection
+    internal sealed class XmlFileCollection<T> : Collection<T>
+        where T : IDocument
     {
-        public XmlFileCollection(IDirectory directory)
-            : base(directory)
+        public XmlFileCollection(IDirectory directory, IDocumentSerializer<T> serializer)
+            : base(directory, serializer)
         {
         }
 

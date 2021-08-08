@@ -1,42 +1,40 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Storage.Collections;
 using DotNetRu.Auditor.Storage.Collections.Bindings;
-using DotNetRu.Auditor.Storage.Collections.Xml;
 using DotNetRu.Auditor.Storage.FileSystem;
 
 namespace DotNetRu.Auditor.Storage
 {
     public static class AuditStore
     {
+        private static readonly Lazy<ServiceContainer> Container = new(ServiceContainer.Build);
+
         public static async Task<IStore> OpenAsync(IDirectory databaseDirectory, StoreOptions? storeOptions = null)
         {
             storeOptions ??= new StoreOptions();
-            var storeCollections = await ScanCollectionsAsync(databaseDirectory).ConfigureAwait(false);
-            var storage = new Store(storeOptions, storeCollections);
+            var collections = await ScanCollectionsAsync(databaseDirectory).ConfigureAwait(false);
+            var storage = new Store(storeOptions, collections);
             return storage;
         }
 
-        private static async Task<IReadOnlyList<Collection>> ScanCollectionsAsync(IDirectory databaseDirectory)
+        private static async Task<IReadOnlyList<IDocumentCollection>> ScanCollectionsAsync(IDirectory databaseDirectory)
         {
             var binder = new CollectionBinder(CreateMatcher);
-            var storeCollections = new List<Collection>();
+            var collections = new List<IDocumentCollection>();
             await foreach (var collection in binder.ScanAsync(databaseDirectory).ConfigureAwait(false))
             {
-                storeCollections.Add(collection);
+                collections.Add(collection);
             }
 
-            return storeCollections;
+            return collections;
         }
 
-        private static Matcher CreateMatcher(IDirectory collectionDirectory)
+        private static Matcher CreateMatcher()
         {
-            var childMatchers = new Matcher[]
-            {
-                new XmlFileMatcher(collectionDirectory),
-                new XmlDirectoryMatcher(collectionDirectory)
-            };
-
+            var container = Container.Value;
+            var childMatchers = container.ResolveAllMatchers();
             return new CompositeMatcher(childMatchers);
         }
     }

@@ -10,6 +10,8 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Bindings
 {
     public sealed class CompositeMatcherTest
     {
+        private readonly IDirectory directory = new Mock<IDirectory>(MockBehavior.Strict).Object;
+
         [Fact]
         public void ShouldMatchSingle()
         {
@@ -23,7 +25,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Bindings
             var compositeMatcher = new CompositeMatcher(new[] { matcher1, matcher2, matcher3 });
 
             // Act
-            var matchedCollection = compositeMatcher.Match();
+            var matchedCollection = compositeMatcher.Match(directory);
 
             // Assert
             Assert.Null(compositeMatcher.ErrorMessage);
@@ -43,7 +45,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Bindings
             var compositeMatcher = new CompositeMatcher(new[] { matcher1, matcher2, matcher3 });
 
             // Act
-            var matchedCollection = compositeMatcher.Match();
+            var matchedCollection = compositeMatcher.Match(directory);
 
             // Assert
             Assert.Null(matchedCollection);
@@ -57,7 +59,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Bindings
             var compositeMatcher = new CompositeMatcher(Array.Empty<Matcher>());
 
             // Act
-            var matchedCollection = compositeMatcher.Match();
+            var matchedCollection = compositeMatcher.Match(directory);
 
             // Assert
             Assert.Null(matchedCollection);
@@ -79,17 +81,15 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Bindings
             public override Task AcceptAsync(IFile file) => throw new NotSupportedException();
             public override Task AcceptAsync(IDirectory directory) => throw new NotSupportedException();
 
-            public override Collection? Match()
+            public override IDocumentCollection? Match(IDirectory collectionDirectory)
             {
                 if (name == null)
                 {
                     return null;
                 }
 
-                var directory = new Mock<IDirectory>(MockBehavior.Strict);
-                directory.Setup(d => d.Name).Returns(name);
-
-                var collection = new Mock<Collection>(MockBehavior.Strict, directory.Object);
+                var collection = new Mock<IDocumentCollection>(MockBehavior.Strict);
+                collection.Setup(c => c.Name).Returns(name);
                 return collection.Object;
             }
         }

@@ -5,7 +5,7 @@ using DotNetRu.Auditor.Data;
 namespace DotNetRu.Auditor.Storage
 {
     // TDO: Add Attachments and Blobs
-    public interface ISession
+    public interface IReadOnlySession
     {
         Task<T?> LoadAsync<T>(string id)
             where T : IDocument;
@@ -15,11 +15,14 @@ namespace DotNetRu.Auditor.Storage
 
         public IAsyncEnumerable<T> QueryAsync<T>()
             where T : IDocument;
+    }
 
+    public interface ISession : IReadOnlySession
+    {
         // TDO: Write methods
-        // void StoreAsync<T>(T document) // Save? Add? Store? Create? Register? Track?
+        // void StoreAsync<T>(T document)
         //     where T : IDocument;
-        //
+
         // Task Delete<T>(T document);
         // Task Delete(string id); // Remove?
         //

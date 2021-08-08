@@ -1,27 +1,28 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Data;
 using DotNetRu.Auditor.Storage.FileSystem;
 
 namespace DotNetRu.Auditor.Storage.Collections
 {
-    internal abstract class Collection
+    internal abstract class Collection<T> : IDocumentCollection
+        where T : IDocument
     {
-        public delegate Task<T?> IndexDeserializer<T>(Stream stream)
-            where T : IDocument;
-
         protected readonly IDirectory Directory;
+        private readonly IDocumentSerializer<T> serializer;
 
-        protected Collection(IDirectory directory)
+        protected Collection(IDirectory directory, IDocumentSerializer<T> serializer)
         {
             Directory = directory;
+            this.serializer = serializer;
         }
 
         public string Name => Directory.Name;
 
-        public async Task<T?> LoadAsync<T>(string id, IndexDeserializer<T> deserializer)
-            where T : IDocument
+        public Type CollectionType => typeof(T);
+
+        public async Task<T?> LoadAsync(string id)
         {
             var indexFile = GetIndexFileAsync(id);
             var exists = await indexFile.ExistsAsync().ConfigureAwait(false);
@@ -30,16 +31,15 @@ namespace DotNetRu.Auditor.Storage.Collections
                 return default;
             }
 
-            var document = await DeserializeIndex(indexFile, deserializer).ConfigureAwait(false);
+            var document = await DeserializeIndex(indexFile).ConfigureAwait(false);
             return document;
         }
 
-        public async IAsyncEnumerable<T> QueryAsync<T>(IndexDeserializer<T> deserializer)
-            where T : IDocument
+        public async IAsyncEnumerable<T> QueryAsync()
         {
             await foreach (var indexFile in EnumerateIndexFilesAsync().ConfigureAwait(false))
             {
-                var document = await DeserializeIndex(indexFile, deserializer).ConfigureAwait(false);
+                var document = await DeserializeIndex(indexFile).ConfigureAwait(false);
 
                 if (document != null)
                 {
@@ -52,11 +52,10 @@ namespace DotNetRu.Auditor.Storage.Collections
 
         protected abstract IAsyncEnumerable<IFile> EnumerateIndexFilesAsync();
 
-        private static async Task<T?> DeserializeIndex<T>(IFile indexFile, IndexDeserializer<T> deserializer)
-            where T : IDocument
+        private async Task<T?> DeserializeIndex(IFile indexFile)
         {
             await using var indexStream = await indexFile.OpenForReadAsync().ConfigureAwait(false);
-            var document = await deserializer(indexStream).ConfigureAwait(false);
+            var document = await serializer.DeserializeAsync(indexStream).ConfigureAwait(false);
             return document;
         }
     }

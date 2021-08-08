@@ -57,7 +57,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Bindings
         public async Task ShouldSkipNullCollection()
         {
             // Arrange
-            var binder = new CollectionBinder(_ => new MeasureMatcher(null, this));
+            var binder = new CollectionBinder(() => new MeasureMatcher(this, true));
             var databaseDirectory = await CreateDatabaseDirectoryAsync().ConfigureAwait(false);
 
             // Act
@@ -99,20 +99,20 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Bindings
             return collectionNames.ToList();
         }
 
-        private Matcher CreateMatcher(IDirectory collectionDirectory)
+        private Matcher CreateMatcher()
         {
-            return new MeasureMatcher(collectionDirectory, this);
+            return new MeasureMatcher(this);
         }
 
         private sealed class MeasureMatcher : Matcher
         {
-            private readonly IDirectory? collectionDirectory;
             private readonly CollectionBinderTest collector;
+            private readonly bool doNotMatch;
 
-            public MeasureMatcher(IDirectory? collectionDirectory, CollectionBinderTest collector)
+            public MeasureMatcher(CollectionBinderTest collector, bool doNotMatch = false)
             {
-                this.collectionDirectory = collectionDirectory;
                 this.collector = collector;
+                this.doNotMatch = doNotMatch;
             }
 
             public override Task AcceptAsync(IFile file)
@@ -127,14 +127,15 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Bindings
                 return Task.CompletedTask;
             }
 
-            public override Collection? Match()
+            public override IDocumentCollection? Match(IDirectory collectionDirectory)
             {
-                if (collectionDirectory == null)
+                if (doNotMatch)
                 {
                     return default;
                 }
 
-                var collection = new Mock<Collection>(MockBehavior.Strict, collectionDirectory);
+                var collection = new Mock<IDocumentCollection>(MockBehavior.Strict);
+                collection.Setup(c => c.Name).Returns(collectionDirectory.Name);
                 return collection.Object;
             }
         }

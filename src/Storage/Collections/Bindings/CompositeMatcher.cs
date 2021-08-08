@@ -23,10 +23,10 @@ namespace DotNetRu.Auditor.Storage.Collections.Bindings
             .Select(matcher => matcher.AcceptAsync(directory))
             .WhenAll();
 
-        public override Collection? Match()
+        public override IDocumentCollection? Match(IDirectory collectionDirectory)
         {
             var collections = matchers
-                .Select(matcher => matcher.Match())
+                .Select(matcher => matcher.Match(collectionDirectory))
                 .Where(match => match != default)
                 .ToList();
 

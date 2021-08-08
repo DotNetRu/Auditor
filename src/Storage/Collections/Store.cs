@@ -2,34 +2,30 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using DotNetRu.Auditor.Data;
-using DotNetRu.Auditor.Data.Xml;
 
 namespace DotNetRu.Auditor.Storage.Collections
 {
     // TDO: Add integration tests
     internal sealed class Store : IStore
     {
-        private readonly IDocumentSerializerFactory serializerFactory = new XmlDocumentSerializerFactory();
         private readonly StoreOptions options;
-        private readonly IReadOnlyDictionary<string, Collection> collections;
+        private readonly IReadOnlyDictionary<Type, IDocumentCollection> collections;
 
-        public Store(StoreOptions options, IReadOnlyList<Collection> collections)
+        public Store(StoreOptions options, IReadOnlyList<IDocumentCollection> collections)
         {
             this.options = options;
-            this.collections = collections.ToDictionary(collection => collection.Name);
+            this.collections = collections.ToDictionary(collection => collection.CollectionType);
         }
 
         public ISession OpenSession(SessionOptions? sessionOptions = null)
         {
             sessionOptions ??= new SessionOptions();
-            return new Session(sessionOptions, TryGetCollection, serializerFactory);
+            return new Session(sessionOptions, TryGetCollection);
         }
 
-        private bool TryGetCollection(Type collectionType, [NotNullWhen(true)] out Collection? collection)
+        private bool TryGetCollection(Type collectionType, [NotNullWhen(true)] out IDocumentCollection? collection)
         {
-            var collectionName = options.MapCollectionName(collectionType);
-            return collections.TryGetValue(collectionName, out collection);
+            return collections.TryGetValue(collectionType, out collection);
         }
     }
 }

@@ -1,5 +1,9 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using DotNetRu.Auditor.Data.Description;
+using DotNetRu.Auditor.Data.Model;
+using DotNetRu.Auditor.Storage.Collections.Xml;
 using DotNetRu.Auditor.Storage.FileSystem;
 using Moq;
 
@@ -25,6 +29,36 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Xml
             file.Setup(f => f.FullName).Returns(fullName);
             file.Setup(f => f.ExistsAsync()).Returns(() => ValueTask.FromResult(exists));
             return file;
+        }
+
+        public static ModelDefinition GetCommunityModel(this ModelRegistry registry)
+        {
+            var communityModel = registry.Models.First(model => model.Name == nameof(Community));
+            return communityModel;
+        }
+
+        public static string GetCommunityCollectionName(this ModelRegistry registry)
+        {
+            var communityModel = registry.GetCommunityModel();
+            return XmlCollectionFactory.ToCollectionName(communityModel.GroupName);
+        }
+
+        public static Community Community(string id, string? name = default)
+        {
+            return new()
+            {
+                Id = id,
+                Name = name ?? id
+            };
+        }
+
+        public static string CommunityState(string id, string? name = default)
+        {
+            return $@"
+<Community>
+  <Id>{id}</Id>
+  <Name>{name ?? id}</Name>
+</Community>";
         }
     }
 }

@@ -6,12 +6,12 @@ namespace DotNetRu.Auditor.Storage.Collections.Xml
 {
     internal sealed class XmlDirectoryMatcher : Matcher
     {
-        private readonly IDirectory collectionDirectory;
+        private readonly IXmlCollectionFactory collectionFactory;
         private int directoryCount;
 
-        public XmlDirectoryMatcher(IDirectory collectionDirectory)
+        public XmlDirectoryMatcher(IXmlCollectionFactory collectionFactory)
         {
-            this.collectionDirectory = collectionDirectory;
+            this.collectionFactory = collectionFactory;
         }
 
         public override Task AcceptAsync(IFile file)
@@ -33,7 +33,7 @@ namespace DotNetRu.Auditor.Storage.Collections.Xml
             directoryCount++;
         }
 
-        public override Collection? Match()
+        public override IDocumentCollection? Match(IDirectory collectionDirectory)
         {
             if (ErrorMessage != null)
             {
@@ -46,7 +46,14 @@ namespace DotNetRu.Auditor.Storage.Collections.Xml
                 return default;
             }
 
-            return new XmlDirectoryCollection(collectionDirectory);
+            var collection = collectionFactory.Create(CollectionStructure.Directory, collectionDirectory);
+            if (collection == null)
+            {
+                ErrorMessage = $"Unknown model for {collectionDirectory.Name}";
+                return default;
+            }
+
+            return collection;
         }
     }
 }

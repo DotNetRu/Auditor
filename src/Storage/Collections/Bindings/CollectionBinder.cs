@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Storage.FileSystem;
 
@@ -6,16 +7,14 @@ namespace DotNetRu.Auditor.Storage.Collections.Bindings
 {
     internal class CollectionBinder
     {
-        public delegate Matcher MatcherFactory(IDirectory collectionDirectory);
+        private readonly Func<Matcher> createMatcher;
 
-        private readonly MatcherFactory createMatcher;
-
-        public CollectionBinder(MatcherFactory createMatcher)
+        public CollectionBinder(Func<Matcher> createMatcher)
         {
             this.createMatcher = createMatcher;
         }
 
-        public async IAsyncEnumerable<Collection> ScanAsync(IDirectory databaseDirectory)
+        public async IAsyncEnumerable<IDocumentCollection> ScanAsync(IDirectory databaseDirectory)
         {
             await foreach (var collectionDirectory in databaseDirectory.EnumerateDirectoriesAsync().ConfigureAwait(false))
             {
@@ -27,9 +26,9 @@ namespace DotNetRu.Auditor.Storage.Collections.Bindings
             }
         }
 
-        private async Task<Collection?> BindCollectionAsync(IDirectory collectionDirectory)
+        private async Task<IDocumentCollection?> BindCollectionAsync(IDirectory collectionDirectory)
         {
-            var matcher = createMatcher(collectionDirectory);
+            var matcher = createMatcher();
 
             await foreach (var directory in collectionDirectory.EnumerateDirectoriesAsync().ConfigureAwait(false))
             {
@@ -41,7 +40,7 @@ namespace DotNetRu.Auditor.Storage.Collections.Bindings
                 await matcher.AcceptAsync(file).ConfigureAwait(false);
             }
 
-            var collection = matcher.Match();
+            var collection = matcher.Match(collectionDirectory);
             return collection;
         }
     }

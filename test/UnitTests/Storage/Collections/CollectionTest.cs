@@ -1,7 +1,8 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Data;
+using DotNetRu.Auditor.Data.Description;
+using DotNetRu.Auditor.Data.Model;
 using DotNetRu.Auditor.Storage.Collections;
 using Xunit;
 
@@ -9,11 +10,11 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
 {
     public abstract class CollectionTest
     {
-        protected const string KnownId = "passwd";
+        protected const string KnownId = nameof(KnownId);
 
-        private readonly Collection collection;
+        private readonly Collection<Community> collection;
 
-        internal CollectionTest(Collection collection)
+        internal CollectionTest(Collection<Community> collection)
         {
             this.collection = collection;
         }
@@ -29,69 +30,72 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
         }
 
         [Fact]
+        public void ShouldHaveType()
+        {
+            // Act
+            var collectionType = collection.CollectionType;
+
+            // Assert
+            Assert.Equal(typeof(Community), collectionType);
+        }
+
+        [Fact]
         public async Task ShouldLoadSingle()
         {
             // Act
-            var secret = await collection.LoadAsync(KnownId, DeserializeSecret).ConfigureAwait(false);
+            var document = await collection.LoadAsync(KnownId).ConfigureAwait(false);
 
             // Assert
-            Assert.NotNull(secret);
-            Assert.Equal(KnownId, secret?.Id);
+            Assert.NotNull(document);
+            Assert.Equal(KnownId, document?.Id);
         }
 
         [Fact]
         public async Task ShouldReturnDefaultWhenLoadNotExistingSingle()
         {
             // Arrange
-            const string unknownId = "shadow";
+            const string unknownId = "unknown";
 
             // Act
-            var secret = await collection.LoadAsync(unknownId, DeserializeSecret).ConfigureAwait(false);
+            var document = await collection.LoadAsync(unknownId).ConfigureAwait(false);
 
             // Assert
-            Assert.Null(secret);
+            Assert.Null(document);
         }
 
         [Fact]
         public async Task ShouldLoadMany()
         {
             // Act
-            var secretList = await collection.QueryAsync(DeserializeSecret).ToListAsync().ConfigureAwait(false);
+            var documentList = await collection.QueryAsync().ToListAsync().ConfigureAwait(false);
 
             // Assert
-            Assert.True(secretList.Count > 1);
-            var secrets = AssertEx.ItemNotNull(secretList);
-            Assert.All(secrets, secret => Assert.StartsWith(KnownId, AssertEx.NotNull(secret.Id)));
+            Assert.True(documentList.Count > 1);
+            var documents = AssertEx.ItemNotNull(documentList);
+            Assert.All(documents, doc => Assert.StartsWith(KnownId, AssertEx.NotNull(doc.Id)));
         }
 
         [Fact]
         public async Task ShouldSkipWhenCantDeserialize()
         {
             // Arrange
-            var secretCount = 0;
-            Task<Secret?> DeserializeFirstSecret(Stream stream) =>
-                ++secretCount == 1 ? DeserializeSecret(stream) : Task.FromResult<Secret?>(null);
+            var badCollection = CreateCollectionWithBadSerializer();
 
             // Act
-            var secretList = await collection.QueryAsync(DeserializeFirstSecret).ToListAsync().ConfigureAwait(false);
+            var documents = await badCollection.QueryAsync().ToListAsync().ConfigureAwait(false);
 
             // Assert
-            var singleSecret = Assert.Single(secretList);
-            var secret = AssertEx.NotNull(singleSecret);
-            Assert.StartsWith(KnownId, AssertEx.NotNull(secret.Id));
+            var maybeDocument = Assert.Single(documents);
+            var document = AssertEx.NotNull(maybeDocument);
+            Assert.StartsWith(KnownId, AssertEx.NotNull(document.Id));
         }
 
-        private static async Task<Secret?> DeserializeSecret(Stream stream)
-        {
-            var state = await stream.ReadAllTextAsync().ConfigureAwait(false);
-            return new Secret(state);
-        }
+        internal abstract Collection<Community> CreateCollectionWithBadSerializer();
 
-        private sealed record Secret(string? Id) : IDocument
+        protected static IDocumentSerializer<Community> CreateSerializer()
         {
-            public string? Name => Id;
-
-            public int GetContentChecksum() => GetHashCode();
+            var serializerFactory = new DocumentSerializerFactory(ModelRegistry.Instance);
+            return serializerFactory.Create<Community>();
         }
     }
 }

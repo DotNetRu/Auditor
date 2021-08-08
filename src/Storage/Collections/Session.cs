@@ -14,40 +14,38 @@ namespace DotNetRu.Auditor.Storage.Collections
     // TDO: Add integration tests
     internal sealed class Session : ISession
     {
-        public delegate bool CollectionResolver(Type collectionType, [NotNullWhen(true)] out Collection? collection);
+        public delegate bool CollectionResolver(Type collectionType, [NotNullWhen(true)] out IDocumentCollection? collection);
 
         private readonly SessionOptions options;
         private readonly CollectionResolver tryResolveCollection;
-        private readonly IDocumentSerializerFactory serializerFactory;
-        private readonly ConcurrentDictionary<Type, IdentityMap> registry = new();
+        private readonly ConcurrentDictionary<Type, IdentityMap> identityMap = new();
 
         public Session(
             SessionOptions options,
-            CollectionResolver tryResolveCollection,
-            IDocumentSerializerFactory serializerFactory)
+            CollectionResolver tryResolveCollection)
         {
             this.options = options;
             this.tryResolveCollection = tryResolveCollection;
-            this.serializerFactory = serializerFactory;
         }
 
         public async Task<T?> LoadAsync<T>(string id)
             where T : IDocument
         {
+            // TDO: Move Identity map to collection wrapper
             var map = GetIdentityMap<T>();
             if (map.TryResolveDocument(id, out var cachedDocument))
             {
                 return cachedDocument;
             }
 
-            if (!tryResolveCollection(typeof(T), out var collection))
+            if (!tryResolveCollection(typeof(T), out var collectionBase))
             {
                 return default;
             }
 
-            var serializer = serializerFactory.Create<T>();
+            var collection = (Collection<T>)collectionBase;
 
-            var document = await collection.LoadAsync(id, serializer.DeserializeAsync);
+            var document = await collection.LoadAsync(id);
 
             if (document?.Id != null)
             {
@@ -68,17 +66,17 @@ namespace DotNetRu.Auditor.Storage.Collections
                 return cachedDocuments;
             }
 
-            if (!tryResolveCollection(typeof(T), out var collection))
+            if (!tryResolveCollection(typeof(T), out var collectionBase))
             {
                 return Dictionary.Empty<string, T>();
             }
 
-            var serializer = serializerFactory.Create<T>();
+            var collection = (Collection<T>)collectionBase;
             var documents = new Dictionary<string, T>(cachedDocuments);
 
             foreach (var id in ids.Except(documents.Keys))
             {
-                var document = await collection.LoadAsync(id, serializer.DeserializeAsync).ConfigureAwait(false);
+                var document = await collection.LoadAsync(id).ConfigureAwait(false);
 
                 if (document?.Id != null)
                 {
@@ -96,17 +94,16 @@ namespace DotNetRu.Auditor.Storage.Collections
         public async IAsyncEnumerable<T> QueryAsync<T>()
             where T : IDocument
         {
-            if (!tryResolveCollection(typeof(T), out var collection))
+            if (!tryResolveCollection(typeof(T), out var collectionBase))
             {
                 yield break;
             }
 
             // TODO: Perf: Check all document IDs in the map before query
             var map = GetIdentityMap<T>();
+            var collection = (Collection<T>)collectionBase;
 
-            var serializer = serializerFactory.Create<T>();
-
-            await foreach (var document in collection.QueryAsync(serializer.DeserializeAsync).ConfigureAwait(false))
+            await foreach (var document in collection.QueryAsync().ConfigureAwait(false))
             {
                 if (document?.Id != null)
                 {
@@ -118,6 +115,6 @@ namespace DotNetRu.Auditor.Storage.Collections
 
         private IdentityMap<T> GetIdentityMap<T>()
             where T : IDocument =>
-            (IdentityMap<T>)registry.GetOrAdd(typeof(T), _ => new IdentityMap<T>());
+            (IdentityMap<T>)identityMap.GetOrAdd(typeof(T), _ => new IdentityMap<T>());
     }
 }

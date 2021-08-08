@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
-using DotNetRu.Auditor.Data;
+﻿using System.Linq;
+using DotNetRu.Auditor.Data.Model;
 using DotNetRu.Auditor.Storage.Collections.Changes;
+using DotNetRu.Auditor.UnitTests.Storage.Collections.Xml;
 using Xunit;
 
 namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Changes
@@ -9,13 +9,13 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Changes
     public sealed class IdentityMapTest
     {
         private const string KnownId = nameof(KnownId);
-        private readonly IdentityMap<Secret> map = new();
+        private readonly IdentityMap<Community> map = new();
 
         [Fact]
         public void ShouldReturnTheSameInstanceWhenRegisterTwice()
         {
             // Arrange
-            var document = new Secret(KnownId);
+            var document = Mocker.Community(KnownId);
 
             // Act
             var firstRegistered = map.RegisterDocument(document);
@@ -29,7 +29,7 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Changes
         public void ShouldReturnTheSameInstanceWhenRegistered()
         {
             // Arrange
-            var document = new Secret(KnownId);
+            var document = Mocker.Community(KnownId);
             var registeredDocument = map.RegisterDocument(document);
 
             // Act
@@ -61,8 +61,8 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Changes
             var id1 = KnownId + 1;
             var id2 = KnownId + 2;
             var id3 = KnownId + 3;
-            var registeredDocument1 = map.RegisterDocument(new Secret(id1));
-            var registeredDocument2 = map.RegisterDocument(new Secret(id2));
+            var registeredDocument1 = map.RegisterDocument(Mocker.Community(id1));
+            var registeredDocument2 = map.RegisterDocument(Mocker.Community(id2));
             var ids = new[] { id2, id1, id3 };
 
             // Act
@@ -86,10 +86,10 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Changes
             var id3 = KnownId + 3;
             var id4 = KnownId + 4;
 
-            map.RegisterDocument(new Secret(id1));
-            var registeredDocument2 = map.RegisterDocument(new Secret(id2));
-            map.RegisterDocument(new Secret(id3));
-            var registeredDocument4 = map.RegisterDocument(new Secret(id4));
+            map.RegisterDocument(Mocker.Community(id1));
+            var registeredDocument2 = map.RegisterDocument(Mocker.Community(id2));
+            map.RegisterDocument(Mocker.Community(id3));
+            var registeredDocument4 = map.RegisterDocument(Mocker.Community(id4));
 
             // Act
             registeredDocument2.Name += " (Modified 2)";
@@ -105,20 +105,6 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Changes
 
             var modifiedDocument4 = Assert.Single(changedDocuments.Where(d => d.Id == id4));
             Assert.Same(registeredDocument4, modifiedDocument4);
-        }
-
-        private sealed class Secret : IDocument
-        {
-            public Secret(string id)
-            {
-                Id = id;
-                Name = Id;
-            }
-
-            public string? Id { get; }
-            public string? Name { get; set; }
-
-            public int GetContentChecksum() => HashCode.Combine(Id, Name);
         }
     }
 }

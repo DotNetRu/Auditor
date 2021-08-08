@@ -1,51 +1,44 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using DotNetRu.Auditor.Data.Model;
+using DotNetRu.Auditor.Data.Xml;
 
-using IEntitySerializer = System.Object;
-
-namespace DotNetRu.Auditor.Data.Xml
+namespace DotNetRu.Auditor.Data.Description
 {
-    public sealed class XmlDocumentSerializerFactory : IDocumentSerializerFactory
+    internal static class ModelFactory
     {
-        private static readonly ConcurrentDictionary<Type, IEntitySerializer> Cache = new();
-
-        public IDocumentSerializer<T> Create<T>()
-            where T : IDocument
+        public static IReadOnlyList<ModelDefinition> CreateModels()
         {
-            // NOTE: When we use XmlSerializer with overrides, framework cannot reuse generated assemblies.
-            // Therefore, to avoid memory leaks, we should cache all serializers with the same overrides.
-            var serializer = Cache.GetOrAdd(typeof(T), _ => Build<T>());
-            return (IDocumentSerializer<T>)serializer;
-        }
-
-        internal static XmlModelBuilder<T> CreateModelBuilder<T>()
-            where T : IDocument
-        {
-            object builder = typeof(T) switch
+            var models = new[]
             {
-                Type type when type == typeof(Community) => BuildCommunity(),
-                Type type when type == typeof(Meetup) => BuildMeetup(),
-                Type type when type == typeof(Speaker) => BuildSpeaker(),
-                Type type when type == typeof(Talk) => BuildTalk(),
-                Type type when type == typeof(Venue) => BuildVenue(),
-                Type type when type == typeof(Friend) => BuildFriend(),
-
-                _ => throw new InvalidOperationException($"Unknown model type: {typeof(T).FullName}")
+                Define(Community()),
+                Define(Meetup()),
+                Define(Speaker()),
+                Define(Talk()),
+                Define(Venue()),
+                Define(Friend())
             };
 
-            return (XmlModelBuilder<T>)builder;
+            return models;
         }
 
-        private static IDocumentSerializer<T> Build<T>()
+        private static ModelDefinition Define<T>(XmlModelBuilder<T> builder)
             where T : IDocument
         {
-            var overrides = CreateModelBuilder<T>().Build();
-            return new XmlDocumentSerializer<T>(overrides);
+            if (builder.Name == null || builder.GroupName == null)
+            {
+                throw new InvalidOperationException("Model builder can't have empty Name or Group Name");
+            }
+
+            // NOTE: When we use XmlSerializer with overrides, framework cannot reuse generated assemblies.
+            // Therefore, to avoid memory leaks, we should cache all serializers with the same overrides.
+            var serializer = new XmlDocumentSerializer<T>(builder.Overrides);
+
+            return new ModelDefinition(builder.Name, builder.GroupName, typeof(T), serializer);
         }
 
-        private static XmlModelBuilder<Community> BuildCommunity() => XmlModelBuilder<Community>
-            .Map("Community")
+        private static XmlModelBuilder<Community> Community() => XmlModelBuilder<Community>
+            .Map("Community", "Communities")
             .Property(community => community.Id, "Id")
             .Property(community => community.Name, "Name")
             .Property(community => community.City, "City")
@@ -57,8 +50,8 @@ namespace DotNetRu.Auditor.Data.Xml
             .Property(community => community.MeetupComUrl, "MeetupComUrl")
             .Property(community => community.TimePadUrl, "TimePadUrl");
 
-        private static XmlModelBuilder<Meetup> BuildMeetup() => XmlModelBuilder<Meetup>
-            .Map("Meetup")
+        private static XmlModelBuilder<Meetup> Meetup() => XmlModelBuilder<Meetup>
+            .Map("Meetup", "Meetups")
             .Property(meetup => meetup.Id, "Id")
             .Property(meetup => meetup.Name, "Name")
             .Property(meetup => meetup.CommunityId, "CommunityId")
@@ -72,8 +65,8 @@ namespace DotNetRu.Auditor.Data.Xml
                     .Property(session => session.EndTime, "EndTime");
             });
 
-        private static XmlModelBuilder<Speaker> BuildSpeaker() => XmlModelBuilder<Speaker>
-            .Map("Speaker")
+        private static XmlModelBuilder<Speaker> Speaker() => XmlModelBuilder<Speaker>
+            .Map("Speaker", "Speakers")
             .Property(speaker => speaker.Id, "Id")
             .Property(speaker => speaker.Name, "Name")
             .Property(speaker => speaker.CompanyName, "CompanyName")
@@ -85,8 +78,8 @@ namespace DotNetRu.Auditor.Data.Xml
             .Property(speaker => speaker.HabrUrl, "HabrUrl")
             .Property(speaker => speaker.GitHubUrl, "GitHubUrl");
 
-        private static XmlModelBuilder<Talk> BuildTalk() => XmlModelBuilder<Talk>
-            .Map("Talk")
+        private static XmlModelBuilder<Talk> Talk() => XmlModelBuilder<Talk>
+            .Map("Talk", "Talks")
             .Property(talk => talk.Id, "Id")
             .Collection(talk => talk.SpeakerIds, "SpeakerIds", "SpeakerId")
             .Property(talk => talk.Name, "Title")
@@ -96,16 +89,16 @@ namespace DotNetRu.Auditor.Data.Xml
             .Property(talk => talk.SlidesUrl, "SlidesUrl")
             .Property(talk => talk.VideoUrl, "VideoUrl");
 
-        private static XmlModelBuilder<Venue> BuildVenue() => XmlModelBuilder<Venue>
-            .Map("Venue")
+        private static XmlModelBuilder<Venue> Venue() => XmlModelBuilder<Venue>
+            .Map("Venue", "Venues")
             .Property(venue => venue.Id, "Id")
             .Property(venue => venue.Name, "Name")
             .Property(venue => venue.Capacity, "Capacity")
             .Property(venue => venue.Address, "Address")
             .Property(venue => venue.MapUrl, "MapUrl");
 
-        private static XmlModelBuilder<Friend> BuildFriend() => XmlModelBuilder<Friend>
-            .Map("Friend")
+        private static XmlModelBuilder<Friend> Friend() => XmlModelBuilder<Friend>
+            .Map("Friend", "Friends")
             .Property(friend => friend.Id, "Id")
             .Property(friend => friend.Name, "Name")
             .Property(friend => friend.Url, "Url")

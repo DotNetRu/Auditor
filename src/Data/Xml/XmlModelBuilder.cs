@@ -18,10 +18,24 @@ namespace DotNetRu.Auditor.Data.Xml
             ignoredMembers = new HashSet<string>(ignoredMembersByDefault);
         }
 
-        public static XmlModelBuilder<T> Map(string typeName)
+        public string? Name { get; private set; }
+
+        public string? GroupName { get; private set; }
+
+        public XmlAttributeOverrides Overrides
+        {
+            get
+            {
+                IgnoreMembers();
+                return overrides;
+            }
+        }
+
+        public static XmlModelBuilder<T> Map(string name, string groupName)
         {
             return Create<T>()
-                .WithRoot(typeName);
+                .WithName(name)
+                .WithGroup(groupName);
         }
 
         private static XmlModelBuilder<TSub> Create<TSub>(XmlAttributeOverrides? overrides = null)
@@ -70,29 +84,35 @@ namespace DotNetRu.Auditor.Data.Xml
 
             var subBuilder = Create<TSub>(overrides);
             configure(subBuilder);
-            subBuilder.Build();
+            subBuilder.IgnoreMembers();
             return this;
         }
 
-        public XmlAttributeOverrides Build()
+        private XmlModelBuilder<T> WithName(string name)
+        {
+            Name = name;
+
+            var rootAttribute = new XmlAttributes
+            {
+                XmlType = new XmlTypeAttribute(Name)
+            };
+
+            overrides.Add(typeof(T), rootAttribute);
+            return this;
+        }
+
+        private XmlModelBuilder<T> WithGroup(string groupName)
+        {
+            GroupName = groupName;
+            return this;
+        }
+
+        private void IgnoreMembers()
         {
             foreach (var memberName in ignoredMembers)
             {
                 Ignore(memberName);
             }
-
-            return overrides;
-        }
-
-        private XmlModelBuilder<T> WithRoot(string rootName)
-        {
-            var rootAttribute = new XmlAttributes
-            {
-                XmlType = new XmlTypeAttribute(rootName)
-            };
-
-            overrides.Add(typeof(T), rootAttribute);
-            return this;
         }
 
         private void Ignore(string memberName)

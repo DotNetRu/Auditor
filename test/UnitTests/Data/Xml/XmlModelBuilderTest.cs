@@ -9,6 +9,7 @@ namespace DotNetRu.Auditor.UnitTests.Data.Xml
     public sealed class XmlModelBuilderTest
     {
         private readonly XmlElement root;
+        private readonly string? groupName;
 
         public XmlModelBuilderTest()
         {
@@ -26,7 +27,7 @@ namespace DotNetRu.Auditor.UnitTests.Data.Xml
             };
 
             var model = XmlModelBuilder<Ticket>
-                .Map("OneWayTicket")
+                .Map("OneWayTicket", "OneWayTickets")
                 .Property(map => map.Id, "Number")
                 .Collection(map => map.SpeakerIds, "Speakers", "Speaker")
                 .Collection(map => map.Perks, "SubPerks", "SubPerk", perkModel =>
@@ -36,7 +37,8 @@ namespace DotNetRu.Auditor.UnitTests.Data.Xml
                         .Property(perkMap => perkMap.Volume, "Duration");
                 });
 
-            var serializer = new XmlCuteSerializer(typeof(Ticket), model.Build());
+            groupName = model.GroupName;
+            var serializer = new XmlCuteSerializer(typeof(Ticket), model.Overrides);
             var ticketState = serializer.SerializeObject(ticket);
 
             var document = new XmlDocument();
@@ -49,6 +51,12 @@ namespace DotNetRu.Auditor.UnitTests.Data.Xml
         public void ShouldRenameRoot()
         {
             Assert.Equal("OneWayTicket", root.Name);
+        }
+
+        [Fact]
+        public void ShouldRenameGroup()
+        {
+            Assert.Equal("OneWayTickets", groupName);
         }
 
         [Fact]

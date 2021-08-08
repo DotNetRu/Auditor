@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using DotNetRu.Auditor.Data;
+using DotNetRu.Auditor.Data.Description;
 using DotNetRu.Auditor.Data.Model;
-using DotNetRu.Auditor.Data.Xml;
 using DotNetRu.Auditor.Storage;
 using DotNetRu.Auditor.Storage.FileSystem;
 using DotNetRu.Auditor.Storage.IO;
@@ -31,7 +31,7 @@ namespace DotNetRu.Auditor.IntegrationTests.Collections
                 Name = "AllDotNet Community"
             };
 
-            var serializerFactory = new XmlDocumentSerializerFactory();
+            var serializerFactory = new DocumentSerializerFactory(ModelRegistry.Instance);
             var serializer = serializerFactory.Create<Community>();
 
             await CreateFileAsync(root, community, serializer).ConfigureAwait(false);

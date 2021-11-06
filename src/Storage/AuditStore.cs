@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DotNetRu.Auditor.Storage.Collections;
 using DotNetRu.Auditor.Storage.Collections.Bindings;
 using DotNetRu.Auditor.Storage.FileSystem;
+using DotNetRu.Auditor.Storage.Sessions;
 
 namespace DotNetRu.Auditor.Storage
 {

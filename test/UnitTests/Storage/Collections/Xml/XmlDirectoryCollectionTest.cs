@@ -47,13 +47,13 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections.Xml
             var root = MemoryFileSystem.ForDirectory(AbsolutePath.Root.FullName);
 
             await new[]
-                {
-                    KnownId,
-                    KnownId + "-2"
-                }
-                .Select(id => root.WriteToXmlDirectoryCollectionAsync(id, Mocker.CommunityState(id)))
-                .WhenAll()
-                .ConfigureAwait(false);
+            {
+                KnownId,
+                KnownId + "-2"
+            }
+            .Select(id => root.WriteToXmlDirectoryCollectionAsync(id, Mocker.CommunityState(id)))
+            .WhenAll()
+            .ConfigureAwait(false);
 
             return root;
         }

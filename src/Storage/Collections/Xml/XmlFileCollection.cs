@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Data;
 using DotNetRu.Auditor.Storage.FileSystem;
@@ -13,7 +13,8 @@ namespace DotNetRu.Auditor.Storage.Collections.Xml
         {
         }
 
-        protected override IFile GetIndexFileAsync(string id)
+
+        protected override IFile GetIndexFile(string id)
         {
             var indexFileName = XmlPath.ChangeExtension(id);
             var indexFile = Directory.GetFile(indexFileName);

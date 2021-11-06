@@ -2,21 +2,18 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using DotNetRu.Auditor.Data;
 using DotNetRu.Auditor.Data.Model;
 using DotNetRu.Auditor.Storage;
 using DotNetRu.Auditor.Storage.Collections;
-using Moq;
+using DotNetRu.Auditor.Storage.Sessions;
+using DotNetRu.Auditor.UnitTests.Storage.Collections.Xml;
 using Xunit;
 
-namespace DotNetRu.Auditor.UnitTests.Storage.Collections
+namespace DotNetRu.Auditor.UnitTests.Storage.Sessions
 {
-    // TDO: Add integration tests
-    public sealed class SessionTest
+    public sealed class EmptyDataSessionTest
     {
         private const string SomeId = nameof(SomeId);
-        private static readonly SessionOptions DefaultOptions = new();
-        private static readonly IDocumentSerializerFactory NoFactory = new Mock<IDocumentSerializerFactory>(MockBehavior.Strict).Object;
 
         [Fact]
         public async Task ShouldLoadNullWhenCollectionNotFound()
@@ -25,10 +22,10 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
             var session = CreateEmptySession();
 
             // Act
-            var secret = await session.LoadAsync<Community>(SomeId).ConfigureAwait(false);
+            var community = await session.LoadAsync<Community>(SomeId).ConfigureAwait(false);
 
             // Assert
-            Assert.Null(secret);
+            Assert.Null(community);
         }
 
         [Fact]
@@ -38,10 +35,10 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
             var session = CreateEmptySession();
 
             // Act
-            var secrets = await session.LoadAsync<Community>(new[] { SomeId }).ConfigureAwait(false);
+            var communities = await session.LoadAsync<Community>(new[] { SomeId }).ConfigureAwait(false);
 
             // Assert
-            Assert.Empty(secrets);
+            Assert.Empty(communities);
         }
 
         [Fact]
@@ -51,15 +48,29 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
             var session = CreateEmptySession();
 
             // Act
-            var secrets = await session.QueryAsync<Community>().ToListAsync().ConfigureAwait(false);
+            var communities = await session.QueryAsync<Community>().ToListAsync().ConfigureAwait(false);
 
             // Assert
-            Assert.Empty(secrets);
+            Assert.Empty(communities);
         }
 
-        private static Session CreateEmptySession()
+        [Fact]
+        public async Task ShouldRaiseErrorWhenWriteToUnknownCollection()
         {
-            return new(DefaultOptions, NoCollection);
+            // Arrange
+            var session = CreateEmptySession();
+            var community = Mocker.Community(SomeId);
+
+            // Act
+            Task WriteToUnknownCollection() => session.AddAsync(community);
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(WriteToUnknownCollection).ConfigureAwait(false);
+        }
+
+        private static ISession CreateEmptySession()
+        {
+            return new DataSession(NoCollection);
         }
 
         private static bool NoCollection(Type collectionType, [NotNullWhen(true)] out IDocumentCollection? collection)

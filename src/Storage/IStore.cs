@@ -2,6 +2,8 @@
 {
     public interface IStore
     {
-        ISession OpenSession(SessionOptions? sessionOptions = null);
+        ISession OpenSession();
+
+        IReadOnlySession OpenReadOnlySession();
     }
 }

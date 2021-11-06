@@ -3,7 +3,7 @@ using DotNetRu.Auditor.Data.Description;
 using DotNetRu.Auditor.Storage.Collections.Bindings;
 using DotNetRu.Auditor.Storage.Collections.Xml;
 
-namespace DotNetRu.Auditor.Storage.Collections
+namespace DotNetRu.Auditor.Storage.Sessions
 {
     internal sealed class ServiceContainer
     {

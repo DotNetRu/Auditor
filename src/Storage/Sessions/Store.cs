@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using DotNetRu.Auditor.Storage.Collections;
 
-namespace DotNetRu.Auditor.Storage.Collections
+namespace DotNetRu.Auditor.Storage.Sessions
 {
     // TDO: Add integration tests
     internal sealed class Store : IStore
@@ -17,10 +18,15 @@ namespace DotNetRu.Auditor.Storage.Collections
             this.collections = collections.ToDictionary(collection => collection.CollectionType);
         }
 
-        public ISession OpenSession(SessionOptions? sessionOptions = null)
+        public ISession OpenSession()
         {
-            sessionOptions ??= new SessionOptions();
-            return new Session(sessionOptions, TryGetCollection);
+            var dataSession = new DataSession(TryGetCollection);
+            return new CacheableSession(dataSession);
+        }
+
+        public IReadOnlySession OpenReadOnlySession()
+        {
+            return OpenSession();
         }
 
         private bool TryGetCollection(Type collectionType, [NotNullWhen(true)] out IDocumentCollection? collection)

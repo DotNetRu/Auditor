@@ -13,7 +13,7 @@ namespace DotNetRu.Auditor.Storage.Collections.Xml
         {
         }
 
-        protected override IFile GetIndexFileAsync(string id)
+        protected override IFile GetIndexFile(string id)
         {
             var indexDirectory = Directory.GetDirectory(id);
             var indexFile = indexDirectory.GetFile(XmlPath.IndexFileName);

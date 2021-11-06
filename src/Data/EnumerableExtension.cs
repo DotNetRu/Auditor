@@ -27,5 +27,7 @@ namespace DotNetRu.Auditor.Data
         }
 
         public static Task WhenAll(this IEnumerable<Task> tasks) => Task.WhenAll(tasks);
+
+        public static IReadOnlyList<T> AsEnumerable<T>(this T value) => new[] { value };
     }
 }

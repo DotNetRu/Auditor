@@ -20,12 +20,15 @@ namespace DotNetRu.Auditor.Storage
     public interface ISession : IReadOnlySession
     {
         // TDO: Write methods
-        // void StoreAsync<T>(T document)
-        //     where T : IDocument;
+        Task AddAsync<T>(T document) // Track? Register? Add? Store?
+            where T : IDocument;
 
         // Task Delete<T>(T document);
         // Task Delete(string id); // Remove?
-        //
-        // Task SaveChangesAsync(CancellationToken token = default);
+    }
+
+    public interface IUnitOfWork
+    {
+        Task SaveChangesAsync();
     }
 }

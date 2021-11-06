@@ -4,6 +4,7 @@ using DotNetRu.Auditor.Data;
 using DotNetRu.Auditor.Data.Description;
 using DotNetRu.Auditor.Data.Model;
 using DotNetRu.Auditor.Storage.Collections;
+using DotNetRu.Auditor.UnitTests.Storage.Collections.Xml;
 using Xunit;
 
 namespace DotNetRu.Auditor.UnitTests.Storage.Collections
@@ -88,6 +89,41 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
             var maybeDocument = Assert.Single(documents);
             var document = AssertEx.NotNull(maybeDocument);
             Assert.StartsWith(KnownId, AssertEx.NotNull(document.Id));
+        }
+
+        [Fact]
+        public async Task ShouldWriteExisted()
+        {
+            // Arrange
+            var maybeDocument = await collection.LoadAsync(KnownId).ConfigureAwait(false);
+            var document = AssertEx.NotNull(maybeDocument);
+
+            const string newName = nameof(ShouldWriteExisted);
+            Assert.NotEqual(newName, document.Name);
+            document.Name = newName;
+
+            // Act
+            await collection.WriteAsync(document).ConfigureAwait(false);
+
+            // Assert
+            var newDocument = await collection.LoadAsync(KnownId).ConfigureAwait(false);
+            Assert.Equal(newName, newDocument?.Name);
+        }
+
+        [Fact]
+        public async Task ShouldWriteNew()
+        {
+            // Arrange
+            const string newId = KnownId + "-New";
+            var newDocument = Mocker.Community(newId);
+
+            // Act
+            await collection.WriteAsync(newDocument).ConfigureAwait(false);
+
+            // Assert
+            var document = await collection.LoadAsync(newId).ConfigureAwait(false);
+            Assert.NotNull(document);
+            Assert.Equal(newId, document?.Id);
         }
 
         internal abstract Collection<Community> CreateCollectionWithBadSerializer();

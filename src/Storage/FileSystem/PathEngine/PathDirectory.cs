@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace DotNetRu.Auditor.Storage.FileSystem.PathEngine
 {
-    internal sealed class PathDirectory : FileSystemEntry, IDirectory
+    internal sealed class PathDirectory : FileSystemEntry, IWritableDirectory
     {
         private readonly IFileSystem fileSystem;
 
@@ -43,6 +43,14 @@ namespace DotNetRu.Auditor.Storage.FileSystem.PathEngine
             {
                 yield return new PathFile(fileFullName, fileSystem);
             }
+        }
+
+        public async Task<bool> DeleteAsync() => await fileSystem.DeleteDirectoryAsync(FullName).ConfigureAwait(false);
+
+        public async Task<IWritableDirectory?> RequestWriteAccessAsync()
+        {
+            var accessGranted = await fileSystem.RequestWriteAccessForDirectoryAsync(FullName).ConfigureAwait(false);
+            return accessGranted ? this : null;
         }
     }
 }

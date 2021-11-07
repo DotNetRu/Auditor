@@ -14,7 +14,7 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Memory
         {
             var directoryPath = AbsolutePath.Parse(path);
 
-            return allFiles.Keys.Any(directoryPath.IsParentDirectoryFor);
+            return EnumerateDirectoryContent(directoryPath).Any();
         }
 
         public bool FileExists(string path)
@@ -51,6 +51,24 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Memory
             return false;
         }
 
+        public bool DeleteDirectory(string path)
+        {
+            var directoryPath = AbsolutePath.Parse(path);
+
+            var filesInDirectory = EnumerateDirectoryContent(directoryPath).ToList();
+            if (!filesInDirectory.Any())
+            {
+                return false;
+            }
+
+            foreach (var filePath in filesInDirectory)
+            {
+                DeleteFile(filePath.FullName);
+            }
+
+            return !DirectoryExists(path);
+        }
+
         public IEnumerable<string> EnumerateEntries(string path, bool isFile)
         {
             var directoryPath = AbsolutePath.Parse(path);
@@ -70,12 +88,14 @@ namespace DotNetRu.Auditor.Storage.FileSystem.Memory
                 (filePath.TakeParent(entryDepth), false);
 
             // ReSharper disable once InconsistentlySynchronizedField
-            return allFiles
-                .Keys
-                .Where(directoryPath.IsParentDirectoryFor)
-                .Where(filePath => filePath.Count > directoryPath.Count)
+            return EnumerateDirectoryContent(directoryPath)
                 .Select(PathWithDepth)
                 .Distinct();
         }
+
+        private IEnumerable<AbsolutePath> EnumerateDirectoryContent(AbsolutePath directoryPath) =>
+            allFiles
+                .Keys
+                .Where(directoryPath.IsParentDirectoryFor);
     }
 }

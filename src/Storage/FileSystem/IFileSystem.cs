@@ -25,10 +25,14 @@ namespace DotNetRu.Auditor.Storage.FileSystem
 
         ValueTask<bool> RequestWriteAccessForFileAsync(string path);
 
+        ValueTask<bool> RequestWriteAccessForDirectoryAsync(string path);
+
         ValueTask<Stream> OpenFileForReadAsync(string path);
 
         ValueTask<Stream> OpenFileForWriteAsync(string path);
 
         ValueTask<bool> DeleteFileAsync(string path);
+
+        ValueTask<bool> DeleteDirectoryAsync(string path);
     }
 }

@@ -27,6 +27,9 @@
     <Compile Include="..\UnitTests\AssertEx.cs">
       <Link>AssertEx.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\FileSystemExtension.cs">
+      <Link>FileSystemExtension.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\StreamExtension.cs">
       <Link>StreamExtension.cs</Link>
     </Compile>

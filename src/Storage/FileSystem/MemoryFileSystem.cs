@@ -59,6 +59,11 @@ namespace DotNetRu.Auditor.Storage.FileSystem
             return ValueTask.FromResult(true);
         }
 
+        public ValueTask<bool> RequestWriteAccessForDirectoryAsync(string path)
+        {
+            return ValueTask.FromResult(true);
+        }
+
         ValueTask<Stream> IFileSystem.OpenFileForReadAsync(string path)
         {
             if (!entries.TryGetFile(path, out var file))
@@ -82,6 +87,12 @@ namespace DotNetRu.Auditor.Storage.FileSystem
         ValueTask<bool> IFileSystem.DeleteFileAsync(string path)
         {
             var deleted = entries.DeleteFile(path);
+            return ValueTask.FromResult(deleted);
+        }
+
+        public ValueTask<bool> DeleteDirectoryAsync(string path)
+        {
+            var deleted = entries.DeleteDirectory(path);
             return ValueTask.FromResult(deleted);
         }
 

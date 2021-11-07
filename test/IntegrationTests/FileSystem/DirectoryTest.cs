@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Storage.FileSystem;
+using DotNetRu.Auditor.UnitTests;
 using Xunit;
 
 namespace DotNetRu.Auditor.IntegrationTests.FileSystem
@@ -155,6 +157,77 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
                 var exists = await file.ExistsAsync().ConfigureAwait(false);
                 Assert.False(exists);
             }
+        }
+
+        [Fact]
+        public async Task ShouldDelete()
+        {
+            foreach (var root in directories)
+            {
+                // Arrange
+                var directory = await CreateTestDirectoryAsync(root).ConfigureAwait(false);
+
+                var directoryExists = await directory.ExistsAsync().ConfigureAwait(false);
+                Assert.True(directoryExists);
+
+                var writable = await GetWritable(directory).ConfigureAwait(false);
+
+                // Act
+                var wasDeleted = await writable.DeleteAsync().ConfigureAwait(false);
+
+                // Assert
+                Assert.True(wasDeleted);
+
+                directoryExists = await directory.ExistsAsync().ConfigureAwait(false);
+                Assert.False(directoryExists);
+            }
+        }
+
+        [Fact]
+        public async Task ShouldReturnFalseWhenDeleteNonExistent()
+        {
+            foreach (var root in directories)
+            {
+                // Arrange
+                var directory = await CreateTestDirectoryAsync(root).ConfigureAwait(false);
+                directory = directory.GetDirectory("Non existent");
+
+                var directoryExists = await directory.ExistsAsync().ConfigureAwait(false);
+                Assert.False(directoryExists);
+
+                var writable = await GetWritable(directory).ConfigureAwait(false);
+
+                // Act
+                var wasDeleted = await writable.DeleteAsync().ConfigureAwait(false);
+
+                // Assert
+                Assert.False(wasDeleted);
+            };
+        }
+
+        private static async Task<IWritableDirectory> GetWritable(IDirectory directory)
+        {
+            var writable = await directory.RequestWriteAccessAsync().ConfigureAwait(false);
+            return AssertEx.NotNull(writable);
+        }
+
+        private static async Task<IDirectory> CreateTestDirectoryAsync(IDirectory root)
+        {
+            static string Rand() => Guid.NewGuid().ToString("N");
+
+            var directory = root.GetDirectory("C").GetDirectory(Rand());
+            await directory.GetFile(Rand()).WriteAllTextAsync(Rand()).ConfigureAwait(false);
+            await directory.GetFile(Rand()).WriteAllTextAsync(Rand()).ConfigureAwait(false);
+
+            var subDirectory1 = directory.GetDirectory(Rand());
+            await subDirectory1.GetFile(Rand()).WriteAllTextAsync(Rand()).ConfigureAwait(false);
+            await subDirectory1.GetFile(Rand()).WriteAllTextAsync(Rand()).ConfigureAwait(false);
+            await subDirectory1.GetFile(Rand()).WriteAllTextAsync(Rand()).ConfigureAwait(false);
+
+            var subDirectory2 = directory.GetDirectory(Rand());
+            await subDirectory2.GetFile(Rand()).WriteAllTextAsync(Rand()).ConfigureAwait(false);
+
+            return directory;
         }
     }
 }

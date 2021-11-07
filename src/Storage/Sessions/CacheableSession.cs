@@ -5,7 +5,7 @@ using DotNetRu.Auditor.Data;
 
 namespace DotNetRu.Auditor.Storage.Sessions
 {
-    internal class CacheableSession : ISession, IUnitOfWork
+    internal class CacheableSession : IUnitOfWork
     {
         private readonly IDataSession dataSession;
         private readonly IDataCache dataCache;
@@ -20,39 +20,48 @@ namespace DotNetRu.Auditor.Storage.Sessions
             where T : IDocument
         {
             var map = GetIdentityMap<T>();
-            if (map.TryGet(id, out var cachedDocument))
+            var status = map.Resolve(id);
+
+            switch (status)
             {
-                return cachedDocument;
+                case { Cache: { }, IsDeleted: false }:
+                    return status.Cache;
+                case { Cache: null, IsDeleted: true }:
+                    return default;
             }
 
             var document = await dataSession.LoadAsync<T>(id).ConfigureAwait(false);
+            if (document == null)
+            {
+                return default;
+            }
 
-            return document?.Id == null ? default : map.RegisterOrigin(document);
+            status = map.RegisterOrigin(document);
+            return status.Cache;
         }
 
         public async Task<IReadOnlyDictionary<string, T>> LoadAsync<T>(IReadOnlyList<string> ids)
             where T : IDocument
         {
             var map = GetIdentityMap<T>();
-            var cachedDocuments = map.GetDocuments(ids);
-            if (cachedDocuments.Count == ids.Count)
+            var (cache, deleted) = map.Resolve(ids);
+
+            if (cache.Count + deleted.Count == ids.Count)
             {
-                return cachedDocuments;
+                // We found all
+                return cache;
             }
 
-            var documents = new Dictionary<string, T>(cachedDocuments);
-            var newIds = ids.Except(documents.Keys).ToList();
+            var documents = new Dictionary<string, T>(cache);
+            var newIds = ids.Except(documents.Keys).Except(deleted.Keys).ToList();
             var newDocuments = await dataSession.LoadAsync<T>(newIds).ConfigureAwait(false);
 
             foreach (var (_, newDocument) in newDocuments)
             {
-                if (newDocument.Id != null)
+                var registeredDocument = map.RegisterOrigin(newDocument).Cache;
+                if (registeredDocument?.Id != null)
                 {
-                    var registeredDocument = map.RegisterOrigin(newDocument);
-                    if (registeredDocument.Id != null)
-                    {
-                        documents.Add(registeredDocument.Id, registeredDocument);
-                    }
+                    documents.Add(registeredDocument.Id, registeredDocument);
                 }
             }
 
@@ -67,9 +76,9 @@ namespace DotNetRu.Auditor.Storage.Sessions
 
             await foreach (var document in dataSession.QueryAsync<T>().ConfigureAwait(false))
             {
-                if (document.Id != null)
+                var registeredDocument = map.RegisterOrigin(document).Cache;
+                if (registeredDocument != null)
                 {
-                    var registeredDocument = map.RegisterOrigin(document);
                     yield return registeredDocument;
                 }
             }
@@ -85,16 +94,18 @@ namespace DotNetRu.Auditor.Storage.Sessions
             return Task.CompletedTask;
         }
 
+        public Task DeleteAsync<T>(T document)
+            where T : IDocument
+        {
+            var map = GetIdentityMap<T>();
+
+            map.RegisterDeleted(document);
+
+            return Task.CompletedTask;
+        }
+
         public Task SaveChangesAsync()
         {
-            // TDO: Refactor for testability
-            // TDO: Process all states
-            // TDO: Do not write twice
-            // [x] Unchanged — skipp
-            // [x] Modified — write
-            // [x] Added — write
-            // [ ] Deleted - remove
-
             return dataCache
                 .GetAllMaps()
                 // HACK: Dynamic dispatch
@@ -102,11 +113,13 @@ namespace DotNetRu.Auditor.Storage.Sessions
                 .WhenAll();
         }
 
-        private Task SaveMapAsync<T>(IdentityMap<T> map)
+        private async Task SaveMapAsync<T>(IdentityMap<T> map)
             where T : IDocument
         {
-            var documents = map.PopChanges();
-            return dataSession.WriteAsync(documents);
+            var (writeList, deleteList) = map.PopChanges();
+
+            await dataSession.WriteAsync(writeList).ConfigureAwait(false);
+            await dataSession.DeleteAsync(deleteList).ConfigureAwait(false);
         }
 
         private IdentityMap<T> GetIdentityMap<T>()

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace DotNetRu.Auditor.IntegrationTests.Collections
 {
-    // TDO: More tests after completion of Modification feature
+    // TDO: More fully integration tests for Session after completion of Modification feature
     [Collection(StoreFixture.Name)]
     public sealed class StoreTest
     {

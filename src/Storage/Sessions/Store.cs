@@ -6,7 +6,6 @@ using DotNetRu.Auditor.Storage.Collections;
 
 namespace DotNetRu.Auditor.Storage.Sessions
 {
-    // TDO: Add integration tests
     internal sealed class Store : IStore
     {
         private readonly StoreOptions options;
@@ -18,7 +17,7 @@ namespace DotNetRu.Auditor.Storage.Sessions
             this.collections = collections.ToDictionary(collection => collection.CollectionType);
         }
 
-        public ISession OpenSession()
+        public IUnitOfWork OpenSession()
         {
             var dataSession = new DataSession(TryGetCollection);
             return new CacheableSession(dataSession);

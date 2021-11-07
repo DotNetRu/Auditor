@@ -2,7 +2,7 @@
 {
     public interface IStore
     {
-        ISession OpenSession();
+        IUnitOfWork OpenSession();
 
         IReadOnlySession OpenReadOnlySession();
     }

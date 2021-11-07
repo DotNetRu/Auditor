@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DotNetRu.Auditor.Storage.FileSystem
 {
@@ -11,5 +12,7 @@ namespace DotNetRu.Auditor.Storage.FileSystem
         IAsyncEnumerable<IDirectory> EnumerateDirectoriesAsync();
 
         IAsyncEnumerable<IFile> EnumerateFilesAsync();
+
+        Task<IWritableDirectory?> RequestWriteAccessAsync();
     }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Storage.FileSystem;
 using DotNetRu.Auditor.Storage.IO;
+using DotNetRu.Auditor.UnitTests;
 using Xunit;
 
 namespace DotNetRu.Auditor.IntegrationTests.FileSystem
@@ -58,7 +59,7 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
             await CreateFileAsync(root, Path.Combine("C", "c0.txt")).ConfigureAwait(false);
         }
 
-        private static async ValueTask<IWritableFile> CreateFileAsync(IDirectory root, string relativeFilePath)
+        private static async Task CreateFileAsync(IDirectory root, string relativeFilePath)
         {
             var fileParentDirectoryName = Path.GetDirectoryName(relativeFilePath);
             var fileName = Path.GetFileName(relativeFilePath);
@@ -73,23 +74,10 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
             var fileExists = await file.ExistsAsync().ConfigureAwait(false);
             Assert.False(fileExists);
 
-            var writableFile = await file.RequestWriteAccessAsync().ConfigureAwait(false);
-            writableFile = AssertEx.NotNull(writableFile);
-
-            var fileStream = await writableFile.OpenForWriteAsync().ConfigureAwait(false);
-            await using (fileStream.ConfigureAwait(false))
-            {
-                var fileWriter = new StreamWriter(fileStream);
-                await using (fileWriter.ConfigureAwait(false))
-                {
-                    await fileWriter.WriteAsync(file.FullName).ConfigureAwait(false);
-                }
-            }
+            await file.WriteAllTextAsync(file.FullName).ConfigureAwait(false);
 
             fileExists = await file.ExistsAsync().ConfigureAwait(false);
             Assert.True(fileExists);
-
-            return writableFile;
         }
     }
 }

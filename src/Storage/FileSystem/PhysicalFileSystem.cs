@@ -70,6 +70,12 @@ namespace DotNetRu.Auditor.Storage.FileSystem
             return ValueTask.FromResult(true);
         }
 
+        public ValueTask<bool> RequestWriteAccessForDirectoryAsync(string path)
+        {
+            // TODO: Test real file system permissions
+            return ValueTask.FromResult(true);
+        }
+
         ValueTask<Stream> IFileSystem.OpenFileForReadAsync(string path)
         {
             var exists = File.Exists(path);
@@ -108,6 +114,27 @@ namespace DotNetRu.Auditor.Storage.FileSystem
             }
 
             exists = File.Exists(path);
+            return ValueTask.FromResult(!exists);
+        }
+
+        public ValueTask<bool> DeleteDirectoryAsync(string path)
+        {
+            var exists = Directory.Exists(path);
+            if (!exists)
+            {
+                return ValueTask.FromResult(false);
+            }
+
+            try
+            {
+                Directory.Delete(path, recursive: true);
+            }
+            catch (Exception)
+            {
+                // Result will be checked later
+            }
+
+            exists = Directory.Exists(path);
             return ValueTask.FromResult(!exists);
         }
 

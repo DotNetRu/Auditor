@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using DotNetRu.Auditor.Storage.Collections.Xml;
 using DotNetRu.Auditor.Storage.FileSystem;
 
 namespace DotNetRu.Auditor.UnitTests
@@ -21,18 +20,15 @@ namespace DotNetRu.Auditor.UnitTests
 
         public static async Task WriteAllTextAsync(this IWritableFile file, string content)
         {
-            await using var fileStream = await file.OpenForWriteAsync().ConfigureAwait(false);
-            await using var fileWriter = new StreamWriter(fileStream);
-            await fileWriter.WriteAsync(content).ConfigureAwait(false);
+            var fileStream = await file.OpenForWriteAsync().ConfigureAwait(false);
+            await using (fileStream.ConfigureAwait(false))
+            {
+                var fileWriter = new StreamWriter(fileStream);
+                await using (fileWriter.ConfigureAwait(false))
+                {
+                    await fileWriter.WriteAsync(content).ConfigureAwait(false);
+                }
+            }
         }
-
-        public static Task WriteToXmlDirectoryCollectionAsync(this IDirectory collectionDirectory, string id, string content = "") => collectionDirectory
-            .GetDirectory(id)
-            .GetFile(XmlPath.IndexFileName)
-            .WriteAllTextAsync(content);
-
-        public static Task WriteToXmlFileCollectionAsync(this IDirectory collectionDirectory, string id, string content = "") => collectionDirectory
-            .GetFile(XmlPath.ChangeExtension(id))
-            .WriteAllTextAsync(content);
     }
 }

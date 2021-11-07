@@ -18,7 +18,7 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
         {
             files = fixture
                 .AllRoots
-                .Select(Initialize)
+                .Select(CreateTestFile)
                 .ToList();
         }
 
@@ -29,7 +29,7 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
             {
                 // Arrange
                 const string content = "abc 123";
-                await WriteAsync(file, content).ConfigureAwait(false);
+                await file.WriteAllTextAsync(content).ConfigureAwait(false);
 
                 var fileStream = await file.OpenForReadAsync().ConfigureAwait(false);
                 await using (fileStream.ConfigureAwait(false))
@@ -70,7 +70,7 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
                 Assert.False(fileExists);
 
                 // Act
-                await WriteAsync(file, "123").ConfigureAwait(false);
+                await file.WriteAllTextAsync("123").ConfigureAwait(false);
 
                 // Assert
                 fileExists = await file.ExistsAsync().ConfigureAwait(false);
@@ -84,7 +84,7 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
             foreach (var file in files)
             {
                 // Arrange
-                await WriteAsync(file, "123").ConfigureAwait(false);
+                await file.WriteAllTextAsync("123").ConfigureAwait(false);
 
                 var fileExists = await file.ExistsAsync().ConfigureAwait(false);
                 Assert.True(fileExists);
@@ -123,32 +123,17 @@ namespace DotNetRu.Auditor.IntegrationTests.FileSystem
 
         private static async Task<IWritableFile> GetWritable(IFile file)
         {
-            var writableFile = await file.RequestWriteAccessAsync().ConfigureAwait(false);
-            return AssertEx.NotNull(writableFile);
+            var writable = await file.RequestWriteAccessAsync().ConfigureAwait(false);
+            return AssertEx.NotNull(writable);
         }
 
-        private static async Task WriteAsync(IFile file, string content)
-        {
-            var writable = await GetWritable(file).ConfigureAwait(false);
-
-            var fileStream = await writable.OpenForWriteAsync().ConfigureAwait(false);
-            await using (fileStream.ConfigureAwait(false))
-            {
-                var fileWriter = new StreamWriter(fileStream);
-                await using (fileWriter.ConfigureAwait(false))
-                {
-                    await fileWriter.WriteAsync(content).ConfigureAwait(false);
-                }
-            }
-        }
-
-        private static IFile Initialize(IDirectory root)
+        private static IFile CreateTestFile(IDirectory root)
         {
             static string Rand() => Guid.NewGuid().ToString("N");
 
-            var directory = root.GetDirectory("C");
-            var name = Path.Combine(Rand(), Rand(), Rand()) + ".test";
-            var file = directory.GetFile(name);
+            var directory = root.GetDirectory("C").GetDirectory(Rand());
+            var fileName = Rand() + ".test";
+            var file = directory.GetFile(fileName);
             return file;
         }
     }

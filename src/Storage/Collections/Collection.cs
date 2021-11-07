@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Data;
@@ -56,15 +56,20 @@ namespace DotNetRu.Auditor.Storage.Collections
             return SerializeIndexAsync(indexFile, document);
         }
 
+        public abstract Task<bool> DeleteAsync(string id);
+
         protected abstract IFile GetIndexFile(string id);
 
         protected abstract IAsyncEnumerable<IFile> EnumerateIndexFilesAsync();
 
         private async Task<T?> DeserializeIndexAsync(IFile indexFile)
         {
-            await using var indexStream = await indexFile.OpenForReadAsync().ConfigureAwait(false);
-            var document = await serializer.DeserializeAsync(indexStream).ConfigureAwait(false);
-            return document;
+            var indexStream = await indexFile.OpenForReadAsync().ConfigureAwait(false);
+            await using (indexStream.ConfigureAwait(false))
+            {
+                var document = await serializer.DeserializeAsync(indexStream).ConfigureAwait(false);
+                return document;
+            }
         }
 
         private async Task SerializeIndexAsync(IFile indexFile, T document)
@@ -75,8 +80,11 @@ namespace DotNetRu.Auditor.Storage.Collections
                 throw new InvalidOperationException($"Can't write to «{indexFile.FullName}» file");
             }
 
-            await using var indexStream = await writableFile.OpenForWriteAsync().ConfigureAwait(false);
-            await serializer.SerializeAsync(indexStream, document).ConfigureAwait(false);
+            var indexStream = await writableFile.OpenForWriteAsync().ConfigureAwait(false);
+            await using (indexStream.ConfigureAwait(false))
+            {
+                await serializer.SerializeAsync(indexStream, document).ConfigureAwait(false);
+            }
         }
     }
 }

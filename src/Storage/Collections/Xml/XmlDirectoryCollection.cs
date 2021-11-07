@@ -13,6 +13,24 @@ namespace DotNetRu.Auditor.Storage.Collections.Xml
         {
         }
 
+        public override async Task<bool> DeleteAsync(string id)
+        {
+            var indexDirectory = Directory.GetDirectory(id);
+            var exists = await indexDirectory.ExistsAsync().ConfigureAwait(false);
+            if (!exists)
+            {
+                return false;
+            }
+
+            var writableDirectory = await indexDirectory.RequestWriteAccessAsync().ConfigureAwait(false);
+            if (writableDirectory == null)
+            {
+                return false;
+            }
+
+            return await writableDirectory.DeleteAsync().ConfigureAwait(false);
+        }
+
         protected override IFile GetIndexFile(string id)
         {
             var indexDirectory = Directory.GetDirectory(id);

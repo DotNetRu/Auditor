@@ -126,6 +126,37 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Collections
             Assert.Equal(newId, document?.Id);
         }
 
+        [Fact]
+        public async Task ShouldDelete()
+        {
+            // Arrange
+            var maybeDocument = await collection.LoadAsync(KnownId).ConfigureAwait(false);
+            var document = AssertEx.NotNull(maybeDocument);
+            var id = AssertEx.NotNull(document.Id);
+
+            // Act
+            var wasDeleted = await collection.DeleteAsync(id).ConfigureAwait(false);
+
+            // Assert
+            Assert.True(wasDeleted);
+
+            maybeDocument = await collection.LoadAsync(id).ConfigureAwait(false);
+            Assert.Null(maybeDocument);
+        }
+
+        [Fact]
+        public async Task ShouldReturnFalseWhenDeleteNonExistent()
+        {
+            // Arrange
+            const string id = "Non existent";
+
+            // Act
+            var wasDeleted = await collection.DeleteAsync(id).ConfigureAwait(false);
+
+            // Assert
+            Assert.False(wasDeleted);
+        }
+
         internal abstract Collection<Community> CreateCollectionWithBadSerializer();
 
         protected static IDocumentSerializer<Community> CreateSerializer()

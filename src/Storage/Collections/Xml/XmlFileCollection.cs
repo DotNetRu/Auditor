@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetRu.Auditor.Data;
 using DotNetRu.Auditor.Storage.FileSystem;
@@ -13,6 +13,23 @@ namespace DotNetRu.Auditor.Storage.Collections.Xml
         {
         }
 
+        public override async Task<bool> DeleteAsync(string id)
+        {
+            var indexFile = GetIndexFile(id);
+            var exists = await indexFile.ExistsAsync().ConfigureAwait(false);
+            if (!exists)
+            {
+                return false;
+            }
+
+            var writableFile = await indexFile.RequestWriteAccessAsync().ConfigureAwait(false);
+            if (writableFile == null)
+            {
+                return false;
+            }
+
+            return await writableFile.DeleteAsync().ConfigureAwait(false);
+        }
 
         protected override IFile GetIndexFile(string id)
         {

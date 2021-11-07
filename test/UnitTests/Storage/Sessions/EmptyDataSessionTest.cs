@@ -68,6 +68,20 @@ namespace DotNetRu.Auditor.UnitTests.Storage.Sessions
             await Assert.ThrowsAsync<InvalidOperationException>(WriteToUnknownCollection).ConfigureAwait(false);
         }
 
+        [Fact]
+        public async Task ShouldRaiseErrorWhenDeleteFromUnknownCollection()
+        {
+            // Arrange
+            var session = CreateEmptySession();
+            var community = Mocker.Community(SomeId);
+
+            // Act
+            Task DeleteFromUnknownCollection() => session.DeleteAsync(community);
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(DeleteFromUnknownCollection).ConfigureAwait(false);
+        }
+
         private static ISession CreateEmptySession()
         {
             return new DataSession(NoCollection);

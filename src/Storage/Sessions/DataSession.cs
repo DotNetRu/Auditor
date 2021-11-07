@@ -8,12 +8,6 @@ using DotNetRu.Auditor.Storage.Collections;
 
 namespace DotNetRu.Auditor.Storage.Sessions
 {
-    internal interface IDataSession : ISession
-    {
-        Task WriteAsync<T>(IReadOnlyList<T> documents)
-            where T : IDocument;
-    }
-
     internal sealed class DataSession : IDataSession
     {
         public delegate bool CollectionResolver(Type collectionType, [NotNullWhen(true)] out IDocumentCollection? collection);
@@ -75,9 +69,20 @@ namespace DotNetRu.Auditor.Storage.Sessions
             return WriteAsync(document.AsEnumerable());
         }
 
+        public Task DeleteAsync<T>(T document)
+            where T : IDocument
+        {
+            return DeleteAsync(document.AsEnumerable());
+        }
+
         public Task WriteAsync<T>(IReadOnlyList<T> documents)
             where T : IDocument
         {
+            if (documents.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
             if (!TryResolveCollection<T>(out var collection))
             {
                 throw new InvalidOperationException($"Collection «{typeof(T)}» not found");
@@ -85,6 +90,26 @@ namespace DotNetRu.Auditor.Storage.Sessions
 
             return documents
                 .Select(collection.WriteAsync)
+                .WhenAll();
+        }
+
+        public Task DeleteAsync<T>(IReadOnlyList<T> documents)
+            where T : IDocument
+        {
+            if (documents.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
+            if (!TryResolveCollection<T>(out var collection))
+            {
+                throw new InvalidOperationException($"Collection «{typeof(T)}» not found");
+            }
+
+            return documents
+                .Select(document => document.Id)
+                .WhereNotNull()
+                .Select(collection.DeleteAsync)
                 .WhenAll();
         }
 
